@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
+:root {
+  --bg: #F6F5F2;
+  --bg2: #EEEDEA;
+  --card: #FFFFFD;
+  --card2: #FAF9F6;
+  --sage: #648C6C;
+  --sage-l: #8CAF94;
+  --sage-bg: #E8F2EA;
+  --dust: #6482A0;
+  --dust-bg: #E4ECF4;
+  --taupe: #948270;
+  --lav: #8A7CA0;
+  --amber: #AC8A48;
+  --border: #DAD7D0;
+  --border-s: #B4D2B9;
+  --text-d: #201E1C;
+  --text-m: #6E6960;
+  --text-l: #A8A298;
+  --green-ok: #50A864;
+  --shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 16px 48px rgba(0,0,0,0.06);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Serif SC', 'Source Han Serif SC', 'STSong', serif;
+  background: var(--bg);
+  color: var(--text-d);
+  min-height: 100vh;
+}
+
+button { cursor: pointer; font-family: inherit; }
+input, textarea { font-family: inherit; }
