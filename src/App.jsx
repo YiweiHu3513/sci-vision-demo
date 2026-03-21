@@ -51,10 +51,10 @@ export default function App() {
         willChange: 'opacity, transform',
       }}>
         {step === 0 && <Upload   onNext={() => goTo(1)} {...authProps} />}
-        {step === 1 && <Analysis onNext={() => goTo(2)} />}
-        {step === 2 && <Config   onNext={() => goTo(3)} />}
-        {step === 3 && <Pipeline onNext={() => goTo(4)} />}
-        {step === 4 && <Delivery onReset={() => goTo(0)} />}
+        {step === 1 && <Analysis onNext={() => goTo(2)} {...authProps} />}
+        {step === 2 && <Config   onNext={() => goTo(3)} {...authProps} />}
+        {step === 3 && <Pipeline onNext={() => goTo(4)} {...authProps} />}
+        {step === 4 && <Delivery onReset={() => goTo(0)} {...authProps} />}
       </div>
 
       {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}

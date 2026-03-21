@@ -28,7 +28,7 @@ const codeLines = [
 
 const imgColors = ['#B2C0B8','#A6B4C4','#BCA8A0','#ACA0C4','#B6C0AE','#A0B4C0','#C0B2A6'];
 
-export default function Pipeline({ onNext }) {
+export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
   const [progress, setProgress] = useState(0);
   const [activeNode, setActiveNode] = useState(2); // C is active
   const [doneNodes, setDoneNodes] = useState([0,1]); // A, B done
@@ -81,7 +81,7 @@ export default function Pipeline({ onNext }) {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
-      <Navbar />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
       <StepBar active={3} />
 
       <div style={{ padding:'12px 24px' }}>

@@ -132,7 +132,7 @@ function calcEstimate(configs) {
   return { timeStr: timeStr.trim(), pts: totalPts };
 }
 
-export default function Config({ onNext }) {
+export default function Config({ onNext, user, onOpenAuth, onLogout }) {
   const [configs, setConfigs] = useState(INITIAL);
 
   const update = (label, val) => {
@@ -143,7 +143,7 @@ export default function Config({ onNext }) {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
-      <Navbar />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
       <StepBar active={2} />
 
       <div style={{ padding:'16px 24px' }}>

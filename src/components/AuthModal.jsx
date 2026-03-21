@@ -37,6 +37,15 @@ export default function AuthModal({ onClose }) {
     }
   };
 
+  const handleGoogle = async () => {
+    reset(); setLoading(true);
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'https://sci-vision-demo.vercel.app' },
+    });
+    setLoading(false);
+  };
+
   const translateError = (msg) => {
     if (msg.includes('Invalid login credentials')) return '邮箱或密码错误';
     if (msg.includes('Email not confirmed')) return '请先点击邮件中的验证链接';
@@ -104,6 +113,35 @@ export default function AuthModal({ onClose }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24 }}>
           <div style={{ width: 14, height: 14, borderRadius: '50%', border: '1.5px solid var(--text-d)' }} />
           <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: 1 }}>SCI·VISION</span>
+        </div>
+
+        {/* Google 登录 */}
+        <button
+          onClick={handleGoogle}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '11px', marginBottom: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+            border: '1.5px solid var(--border)', borderRadius: 12,
+            background: 'var(--card)', color: 'var(--text-d)',
+            fontSize: 14, fontWeight: 600,
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--bg)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--card)'}
+        >
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.3z"/>
+            <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.1 1.4-4.9 2.3-8 2.3-6.1 0-11.3-4.1-13.2-9.7H2.6v6.2C6.6 42.7 14.7 48 24 48z"/>
+            <path fill="#FBBC05" d="M10.8 28.8c-.5-1.4-.7-2.9-.7-4.8s.3-3.3.7-4.8v-6.2H2.6C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.9l8.2-6.1z"/>
+            <path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.7-6.7C35.8 2.3 30.4 0 24 0 14.7 0 6.6 5.3 2.6 13.1l8.2 6.1C12.7 13.6 17.9 9.5 24 9.5z"/>
+          </svg>
+          使用 Google 账号继续
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          <span style={{ fontSize: 12, color: 'var(--text-l)' }}>或</span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         </div>
 
         {/* Tab 切换 */}

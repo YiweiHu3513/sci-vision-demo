@@ -47,12 +47,12 @@ function VideoContent() {
   );
 }
 
-export default function Delivery({ onReset }) {
+export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
   const [progress] = useState(37.5);
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
-      <Navbar />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
       <StepBar active={4} />
 
       <div style={{ textAlign:'center', padding:'12px 0 8px' }}>

@@ -117,7 +117,7 @@ function EditableField({ label, value, onChange, multiline }) {
   );
 }
 
-export default function Analysis({ onNext }) {
+export default function Analysis({ onNext, user, onOpenAuth, onLogout }) {
   const [data, setData] = useState(initialData);
   const [msgs, setMsgs] = useState(initialMessages);
   const [input, setInput] = useState('');
@@ -145,7 +145,7 @@ export default function Analysis({ onNext }) {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      <Navbar />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
       <StepBar active={1} />
 
       <div style={{ display: 'flex', gap: 16, padding: '16px 24px', height: 'calc(100vh - 120px)' }}>
