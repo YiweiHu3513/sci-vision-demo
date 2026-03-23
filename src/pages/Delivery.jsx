@@ -69,8 +69,8 @@ function ResolutionPicker({ current, onChange }) {
       <button
         onClick={() => setOpen(v => !v)}
         style={{
-          padding:'3px 10px', borderRadius:6, fontSize:11, fontWeight:700,
-          background: 'rgba(255,255,255,0.12)', border:'1px solid rgba(255,255,255,0.18)',
+          padding:'2px 8px', borderRadius:5, fontSize:11, fontWeight:600,
+          background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)',
           color:'#E8E4DC', cursor:'pointer', fontFamily:'inherit',
           display:'flex', alignItems:'center', gap:4,
           transition:'background 0.2s',
