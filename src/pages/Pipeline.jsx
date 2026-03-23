@@ -2,16 +2,25 @@ import { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import StepBar from '../components/StepBar';
 
+/*
+ *  DAG layout — 4 columns, clean fan-out from C
+ *
+ *  col1(100)   col2(260)   col3(440)          col4(660)     col5(830)
+ *     A ──────── B ─┐
+ *     └──────────────┤ C ──┬── D (语音)  ──┐
+ *                    │     ├── G (海报)  ──┤── F (合成)
+ *                    │     └── E (配乐)  ──┘
+ */
 const nodes = [
-  { id:'A', label:'脚本生成',   sub:'JSON 分镜脚本', x:110, y:200 },
-  { id:'B', label:'剧本审校',   sub:'提示词优化',    x:270, y:128 },
-  { id:'C', label:'资产生成',   sub:'Houdini 渲染',  x:430, y:176 },
-  { id:'D', label:'语音合成',   sub:'TTS 中文女声',  x:590, y:80 },
-  { id:'E', label:'配乐混音',   sub:'氛围弦乐',      x:590, y:252 },
-  { id:'G', label:'海报生成',   sub:'A3 排版合成',    x:590, y:176 },
-  { id:'F', label:'视频合成',   sub:'最终剪辑 1080p', x:780, y:176 },
+  { id:'A', label:'脚本生成',   sub:'JSON 分镜脚本', x:100,  y:160 },
+  { id:'B', label:'剧本审校',   sub:'提示词优化',    x:260,  y:110 },
+  { id:'C', label:'资产生成',   sub:'Houdini 渲染',  x:440,  y:160 },
+  { id:'D', label:'语音合成',   sub:'TTS 中文女声',  x:640,  y:72  },
+  { id:'G', label:'海报生成',   sub:'A3 排版合成',    x:640,  y:168 },
+  { id:'E', label:'配乐混音',   sub:'氛围弦乐',      x:640,  y:264 },
+  { id:'F', label:'视频合成',   sub:'最终剪辑 1080p', x:840,  y:168 },
 ];
-const edges = [['A','B'],['A','C'],['B','C'],['B','D'],['C','D'],['C','E'],['C','G'],['D','F'],['E','F'],['G','F']];
+const edges = [['A','B'],['A','C'],['B','C'],['C','D'],['C','G'],['C','E'],['D','F'],['G','F'],['E','F']];
 
 /* ── 10-segment mock script (will be replaced by real backend data) ── */
 const scriptSegments = [
@@ -153,7 +162,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
               border:'1px solid var(--border)', boxShadow:'var(--shadow)',
               padding:'20px', marginBottom:16,
             }}>
-              <svg width="900" height="320" style={{ display:'block', maxWidth:'100%' }}>
+              <svg viewBox="0 0 940 340" style={{ display:'block', width:'100%', height:'auto' }}>
                 {/* Edges */}
                 {edges.map(([a,b]) => {
                   const sa = getNodeStatus(a), sb = getNodeStatus(b);
