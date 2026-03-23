@@ -330,11 +330,11 @@ function SlideCarousel() {
       style={{
         position:'absolute', top:'50%', [dir === -1 ? 'left' : 'right']:0,
         transform:'translateY(-50%)', zIndex:2,
-        width:28, height:28, borderRadius:'50%',
+        width:24, height:24, borderRadius:'50%',
         background:'var(--card)', border:'1px solid var(--border)',
         boxShadow:'0 2px 8px rgba(0,0,0,0.1)',
         display:'flex', alignItems:'center', justifyContent:'center',
-        cursor:'pointer', fontSize:12, color:'var(--text-m)',
+        cursor:'pointer', fontSize:11, color:'var(--text-m)',
         opacity: show ? 1 : 0, pointerEvents: show ? 'auto' : 'none',
         transition:'opacity 0.2s',
       }}
@@ -344,28 +344,27 @@ function SlideCarousel() {
   );
 
   return (
-    <div style={{ marginTop:16 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-        <div style={{ fontSize:13, fontWeight:700 }}>幻灯片预览</div>
-        <div style={{ fontSize:11, color:'var(--text-l)' }}>{slides.length} 张</div>
+    <div style={{ marginTop:12 }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+        <div style={{ fontSize:12, fontWeight:700 }}>幻灯片预览</div>
+        <div style={{ fontSize:10, color:'var(--text-l)' }}>{slides.length} 张 · 左右滑动查看</div>
       </div>
       <div style={{ position:'relative' }}>
         {arrowBtn(-1, canLeft)}
         {arrowBtn(1, canRight)}
-        {/* 左右渐隐遮罩 */}
-        {canLeft && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:32, background:'linear-gradient(to right, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'10px 0 0 10px' }}/>}
-        {canRight && <div style={{ position:'absolute', right:0, top:0, bottom:0, width:32, background:'linear-gradient(to left, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'0 10px 10px 0' }}/>}
+        {canLeft && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:28, background:'linear-gradient(to right, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'8px 0 0 8px' }}/>}
+        {canRight && <div style={{ position:'absolute', right:0, top:0, bottom:0, width:28, background:'linear-gradient(to left, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'0 8px 8px 0' }}/>}
         <div
           ref={scrollRef}
           onScroll={checkScroll}
           className="no-scrollbar"
           style={{
-            display:'flex', gap:10, overflowX:'auto', padding:'2px 4px 6px',
+            display:'flex', gap:8, overflowX:'auto', padding:'2px 4px 4px',
           }}
         >
           {slides.map((s,i) => (
             <div key={i} style={{
-              flex:'0 0 120px', borderRadius:10, overflow:'hidden',
+              flex:'0 0 100px', borderRadius:8, overflow:'hidden',
               border:'1px solid var(--border)',
               boxShadow:'var(--shadow)', background:'var(--card)',
               cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
@@ -373,18 +372,18 @@ function SlideCarousel() {
               onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow)'; }}
             >
-              <div style={{ height:3, background:s.color }}/>
+              <div style={{ height:2, background:s.color }}/>
               <div style={{
-                height:60,
+                height:48,
                 background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
-                padding:'8px',
+                padding:'6px',
               }}>
-                <div style={{ fontSize:10, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
-                <div style={{ height:1, background:`${s.color}40`, margin:'4px 0' }}/>
-                <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
-                <div style={{ height:1, background:'var(--border)', width:'80%' }}/>
+                <div style={{ fontSize:9, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{ height:1, background:`${s.color}40`, margin:'3px 0' }}/>
+                <div style={{ height:1, background:'var(--border)', marginBottom:2 }}/>
+                <div style={{ height:1, background:'var(--border)', width:'75%' }}/>
               </div>
-              <div style={{ fontSize:9, color:'var(--text-m)', padding:'4px 8px 6px' }}>{s.title}</div>
+              <div style={{ fontSize:8, color:'var(--text-m)', padding:'3px 6px 4px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.title}</div>
             </div>
           ))}
         </div>
@@ -393,7 +392,8 @@ function SlideCarousel() {
   );
 }
 
-export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
+export default function Delivery({ onReset, user, onOpenAuth, onLogout, orientation='landscape' }) {
+  const isLandscape = orientation === 'landscape';
   const [progress] = useState(37.5);
   const [currentRes, setCurrentRes] = useState(resolutions[0]); // 默认720p
   const [pendingRes, setPendingRes] = useState(null);            // 等待确认的清晰度
@@ -444,16 +444,16 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
         <span style={{ fontSize:20, fontWeight:700, color:'var(--sage)' }}>✦  视频生成完成</span>
       </div>
 
-      <div style={{ display:'flex', gap:16, padding:'0 24px 16px' }}>
+      <div style={{ display:'flex', gap:16, padding:'0 24px 16px', alignItems:'flex-start' }}>
         {/* 播放器 */}
-        <div style={{ flex:'0 0 56%' }}>
+        <div style={{ flex:'0 0 56%', minWidth:0 }}>
           <div style={{
             borderRadius:16, overflow:'hidden',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             border:'1px solid #2A2826',
           }}>
             {/* 视频区 */}
-            <div style={{ position:'relative', height:340 }}>
+            <div style={{ position:'relative', aspectRatio: isLandscape ? '16/9' : '9/16', maxHeight: isLandscape ? 400 : 520 }}>
               <VideoContent />
               {/* 当前清晰度标签 */}
               <div style={{
