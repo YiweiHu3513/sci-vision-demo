@@ -305,90 +305,44 @@ function UpgradeToast({ resolution }) {
 
 /* ── 幻灯片横向滚动预览 ── */
 function SlideCarousel() {
-  const scrollRef = useRef(null);
-  const [canLeft, setCanLeft] = useState(false);
-  const [canRight, setCanRight] = useState(true);
-
-  const checkScroll = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanLeft(el.scrollLeft > 4);
-    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
-  };
-
-  useEffect(() => { checkScroll(); }, []);
-
-  const scroll = (dir) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * 260, behavior:'smooth' });
-  };
-
-  const arrowBtn = (dir, show) => (
-    <button
-      onClick={() => scroll(dir)}
-      style={{
-        position:'absolute', top:'50%', [dir === -1 ? 'left' : 'right']:-4,
-        transform:'translateY(-50%)', zIndex:2,
-        width:22, height:22, borderRadius:'50%',
-        background:'var(--card)', border:'1px solid var(--border)',
-        boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
-        display:'flex', alignItems:'center', justifyContent:'center',
-        cursor:'pointer', padding:0,
-        opacity: show ? 1 : 0, pointerEvents: show ? 'auto' : 'none',
-        transition:'opacity 0.2s',
-      }}
-    >
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ display:'block' }}>
-        <path d={dir === -1 ? 'M6.5 2L3.5 5L6.5 8' : 'M3.5 2L6.5 5L3.5 8'} stroke="var(--text-m)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </button>
-  );
-
   return (
-    <div style={{ marginTop:12 }}>
+    <div style={{ flex:1, display:'flex', flexDirection:'column', minHeight:0, marginTop:12 }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-        <div style={{ fontSize:12, fontWeight:700 }}>幻灯片预览</div>
-        <div style={{ fontSize:10, color:'var(--text-l)' }}>{slides.length} 张 · 左右滑动查看</div>
+        <div style={{ fontSize:13, fontWeight:700 }}>幻灯片预览</div>
+        <div style={{ fontSize:10, color:'var(--text-l)' }}>{slides.length} 张</div>
       </div>
-      <div style={{ position:'relative' }}>
-        {arrowBtn(-1, canLeft)}
-        {arrowBtn(1, canRight)}
-        {canLeft && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:28, background:'linear-gradient(to right, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'8px 0 0 8px' }}/>}
-        {canRight && <div style={{ position:'absolute', right:0, top:0, bottom:0, width:28, background:'linear-gradient(to left, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'0 8px 8px 0' }}/>}
-        <div
-          ref={scrollRef}
-          onScroll={checkScroll}
-          className="no-scrollbar"
-          style={{
-            display:'flex', gap:8, overflowX:'auto', padding:'2px 4px 4px',
+      <div
+        className="thin-scrollbar"
+        style={{
+          flex:1, display:'flex', gap:10, overflowX:'auto',
+          padding:'0 0 6px',
+        }}
+      >
+        {slides.map((s,i) => (
+          <div key={i} style={{
+            flex:'0 0 130px', borderRadius:10, overflow:'hidden',
+            border:'1px solid var(--border)',
+            boxShadow:'var(--shadow)', background:'var(--card)',
+            cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
+            display:'flex', flexDirection:'column',
           }}
-        >
-          {slides.map((s,i) => (
-            <div key={i} style={{
-              flex:'0 0 100px', borderRadius:8, overflow:'hidden',
-              border:'1px solid var(--border)',
-              boxShadow:'var(--shadow)', background:'var(--card)',
-              cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow)'; }}
-            >
-              <div style={{ height:2, background:s.color }}/>
-              <div style={{
-                height:48,
-                background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
-                padding:'6px',
-              }}>
-                <div style={{ fontSize:9, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
-                <div style={{ height:1, background:`${s.color}40`, margin:'3px 0' }}/>
-                <div style={{ height:1, background:'var(--border)', marginBottom:2 }}/>
-                <div style={{ height:1, background:'var(--border)', width:'75%' }}/>
-              </div>
-              <div style={{ fontSize:8, color:'var(--text-m)', padding:'3px 6px 4px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.title}</div>
+            onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow)'; }}
+          >
+            <div style={{ height:3, background:s.color }}/>
+            <div style={{
+              flex:1,
+              background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
+              padding:'8px',
+            }}>
+              <div style={{ fontSize:10, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
+              <div style={{ height:1, background:`${s.color}40`, margin:'4px 0' }}/>
+              <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
+              <div style={{ height:1, background:'var(--border)', width:'80%' }}/>
             </div>
-          ))}
-        </div>
+            <div style={{ fontSize:9, color:'var(--text-m)', padding:'4px 8px 6px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.title}</div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -446,9 +400,9 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout, orientat
         <span style={{ fontSize:20, fontWeight:700, color:'var(--sage)' }}>✦  视频生成完成</span>
       </div>
 
-      <div style={{ display:'flex', gap:16, padding:'0 24px 16px', alignItems:'flex-start' }}>
-        {/* 播放器 */}
-        <div style={{ flex:'0 0 56%', minWidth:0 }}>
+      <div style={{ display:'flex', gap:16, padding:'0 24px 16px', alignItems:'stretch' }}>
+        {/* 播放器 + 幻灯片 */}
+        <div style={{ flex:'0 0 56%', minWidth:0, display:'flex', flexDirection:'column' }}>
           <div style={{
             borderRadius:16, overflow:'hidden',
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
