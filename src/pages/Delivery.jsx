@@ -454,9 +454,22 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout, orientat
             boxShadow:'0 8px 32px rgba(0,0,0,0.18)',
             border:'1px solid #2A2826',
           }}>
-            {/* 视频区 */}
-            <div style={{ position:'relative', aspectRatio: isLandscape ? '16/9' : '9/16', maxHeight: isLandscape ? 400 : 520 }}>
-              <VideoContent />
+            {/* 视频区 — 固定 16:9 容器，内容按横竖屏适配 */}
+            <div style={{ position:'relative', aspectRatio:'16/9', background:'#0E0D0C' }}>
+              {/* 视频内容区：横屏顶满，竖屏顶高留边 */}
+              <div style={{
+                position:'absolute', inset:0,
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                <div style={{
+                  position:'relative',
+                  ...(isLandscape
+                    ? { width:'100%', height:'100%' }
+                    : { height:'100%', aspectRatio:'9/16' }),
+                }}>
+                  <VideoContent />
+                </div>
+              </div>
               {/* 当前清晰度标签 */}
               <div style={{
                 position:'absolute', top:12, right:12,
