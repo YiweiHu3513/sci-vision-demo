@@ -5,6 +5,7 @@ import StepBar from '../components/StepBar';
 const exportItems = [
   { icon:'▶', label:'下载 MP4 视频',    sub:'1080p · H.264 · 124MB', color:'var(--sage)' },
   { icon:'▦', label:'下载 PPTX 幻灯片', sub:'10 页含分镜配图 · 8MB',  color:'var(--dust)' },
+  { icon:'◈', label:'下载宣传海报',     sub:'A3 竖版 · 含二维码 · 6MB', color:'#ACA08A' },
   { icon:'≡', label:'下载分镜脚本 PDF', sub:'完整 JSON + 说明 · 2MB', color:'var(--taupe)' },
   { icon:'⬡', label:'生成分享链接',     sub:'7 天有效 · 可设密码',    color:'var(--lav)' },
 ];
