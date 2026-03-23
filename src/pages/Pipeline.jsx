@@ -155,14 +155,14 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
         <div style={{ display:'flex', gap:16, alignItems:'flex-start' }}>
           {/* DAG 图 + 拍立得 */}
-          <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ width:'calc(100% - 336px)', flexShrink:0 }}>
             {/* DAG */}
             <div style={{
               background:'var(--card)', borderRadius:14,
               border:'1px solid var(--border)', boxShadow:'var(--shadow)',
               padding:'20px', marginBottom:16,
             }}>
-              <svg viewBox="0 0 940 340" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'auto', aspectRatio:'940/340' }}>
+              <svg viewBox="0 0 940 340" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'auto' }}>
                 {/* Edges */}
                 {edges.map(([a,b]) => {
                   const sa = getNodeStatus(a), sb = getNodeStatus(b);
