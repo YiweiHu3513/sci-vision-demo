@@ -153,9 +153,9 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
           <div style={{ height:'100%', width:`${progress}%`, background:'var(--sage)', borderRadius:3, transition:'width .3s' }}/>
         </div>
 
-        <div style={{ display:'flex', gap:16, alignItems:'flex-start' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 400px', gap:16, alignItems:'start' }}>
           {/* DAG 图 + 拍立得 */}
-          <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
+          <div style={{ minWidth:0 }}>
             {/* DAG */}
             <div style={{
               background:'var(--card)', borderRadius:14,
@@ -266,13 +266,12 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
           {/* 右：JSON 实时输出 */}
           <div style={{
-            flex:'0 0 400px', background:'var(--card)',
+            background:'var(--card)',
             borderRadius:14, border:'1px solid var(--border)',
             boxShadow:'var(--shadow)',
             borderTop:'2px solid var(--taupe)',
             display:'flex', flexDirection:'column',
-            height: 520, minHeight:520, maxHeight:520,
-            alignSelf:'flex-start',
+            height: 520,
           }}>
             <div style={{ padding:'14px 16px 8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <span style={{ fontSize:12, color:'var(--text-l)' }}>
