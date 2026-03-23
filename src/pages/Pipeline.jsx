@@ -155,7 +155,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
         <div style={{ display:'flex', gap:16, alignItems:'flex-start' }}>
           {/* DAG 图 + 拍立得 */}
-          <div style={{ width:'calc(100% - 416px)', flexShrink:0 }}>
+          <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
             {/* DAG */}
             <div style={{
               background:'var(--card)', borderRadius:14,
@@ -271,7 +271,8 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
             boxShadow:'var(--shadow)',
             borderTop:'2px solid var(--taupe)',
             display:'flex', flexDirection:'column',
-            height: 520,
+            height: 520, minHeight:520, maxHeight:520,
+            alignSelf:'flex-start',
           }}>
             <div style={{ padding:'14px 16px 8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <span style={{ fontSize:12, color:'var(--text-l)' }}>

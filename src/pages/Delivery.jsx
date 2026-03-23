@@ -311,10 +311,17 @@ function SlideCarousel() {
         <div style={{ fontSize:13, fontWeight:700 }}>幻灯片预览</div>
         <div style={{ fontSize:10, color:'var(--text-l)' }}>{slides.length} 张</div>
       </div>
+      <div style={{ flex:1, position:'relative', minHeight:0 }}>
+        {/* 右侧渐隐遮罩 */}
+        <div style={{
+          position:'absolute', right:0, top:0, bottom:10,
+          width:48, zIndex:1, pointerEvents:'none',
+          background:'linear-gradient(to right, transparent, var(--bg))',
+        }}/>
       <div
         className="slide-scrollbar"
         style={{
-          flex:1, display:'flex', gap:12, overflowX:'auto',
+          height:'100%', display:'flex', gap:12, overflowX:'auto',
           padding:'0 0 10px',
         }}
       >
@@ -351,6 +358,7 @@ function SlideCarousel() {
             }}>{s.title}</div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );
