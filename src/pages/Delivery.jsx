@@ -306,21 +306,21 @@ function UpgradeToast({ resolution }) {
 /* ── 幻灯片横向滚动预览 ── */
 function SlideCarousel() {
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', minHeight:0, marginTop:12 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+    <div style={{ flex:1, display:'flex', flexDirection:'column', minHeight:0, marginTop:14 }}>
+      <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:10 }}>
         <div style={{ fontSize:13, fontWeight:700 }}>幻灯片预览</div>
         <div style={{ fontSize:10, color:'var(--text-l)' }}>{slides.length} 张</div>
       </div>
       <div
-        className="thin-scrollbar"
+        className="slide-scrollbar"
         style={{
-          flex:1, display:'flex', gap:10, overflowX:'auto',
-          padding:'0 0 6px',
+          flex:1, display:'flex', gap:12, overflowX:'auto',
+          padding:'0 0 10px',
         }}
       >
         {slides.map((s,i) => (
           <div key={i} style={{
-            flex:'0 0 130px', borderRadius:10, overflow:'hidden',
+            flex:'0 0 160px', borderRadius:12, overflow:'hidden',
             border:'1px solid var(--border)',
             boxShadow:'var(--shadow)', background:'var(--card)',
             cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
@@ -331,16 +331,24 @@ function SlideCarousel() {
           >
             <div style={{ height:3, background:s.color }}/>
             <div style={{
-              flex:1,
-              background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
-              padding:'8px',
+              flex:1, minHeight:80,
+              background:`linear-gradient(135deg, ${s.color}18, ${s.color}08)`,
+              padding:'10px',
+              display:'flex', flexDirection:'column', justifyContent:'space-between',
             }}>
-              <div style={{ fontSize:10, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
-              <div style={{ height:1, background:`${s.color}40`, margin:'4px 0' }}/>
-              <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
-              <div style={{ height:1, background:'var(--border)', width:'80%' }}/>
+              <div>
+                <div style={{ fontSize:11, fontWeight:700, color:s.color, marginBottom:6 }}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{ height:1, background:`${s.color}40`, marginBottom:4 }}/>
+                <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
+                <div style={{ height:1, background:'var(--border)', width:'85%', marginBottom:3 }}/>
+                <div style={{ height:1, background:'var(--border)', width:'60%' }}/>
+              </div>
             </div>
-            <div style={{ fontSize:9, color:'var(--text-m)', padding:'4px 8px 6px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.title}</div>
+            <div style={{
+              fontSize:10, color:'var(--text-m)', padding:'6px 10px 8px',
+              borderTop:'1px solid var(--border)',
+              whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis',
+            }}>{s.title}</div>
           </div>
         ))}
       </div>
@@ -409,7 +417,7 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout, orientat
             border:'1px solid #2A2826',
           }}>
             {/* 视频区 — 固定 16:9 容器，内容按横竖屏适配 */}
-            <div style={{ position:'relative', aspectRatio:'16/9', background:'#0E0D0C' }}>
+            <div style={{ position:'relative', aspectRatio:'2.2/1', background:'#0E0D0C' }}>
               {/* 视频内容区：横屏顶满，竖屏顶高留边 */}
               <div style={{
                 position:'absolute', inset:0,

@@ -39,9 +39,13 @@ input, textarea { font-family: inherit; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* thin styled scrollbar for slide carousel */
-.thin-scrollbar::-webkit-scrollbar { height: 4px; }
-.thin-scrollbar::-webkit-scrollbar-track { background: var(--bg2); border-radius: 2px; }
-.thin-scrollbar::-webkit-scrollbar-thumb { background: var(--border-s, #C8C4BE); border-radius: 2px; }
-.thin-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-l); }
-.thin-scrollbar { scrollbar-width: thin; scrollbar-color: var(--border-s, #C8C4BE) var(--bg2); }
+/* styled scrollbar for slide carousel */
+.slide-scrollbar::-webkit-scrollbar { height: 6px; }
+.slide-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.slide-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+.slide-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-l); }
+.slide-scrollbar { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }

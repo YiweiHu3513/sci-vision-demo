@@ -155,14 +155,14 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
         <div style={{ display:'flex', gap:16, alignItems:'flex-start' }}>
           {/* DAG 图 + 拍立得 */}
-          <div style={{ width:'calc(100% - 336px)', flexShrink:0 }}>
+          <div style={{ width:'calc(100% - 416px)', flexShrink:0 }}>
             {/* DAG */}
             <div style={{
               background:'var(--card)', borderRadius:14,
               border:'1px solid var(--border)', boxShadow:'var(--shadow)',
-              padding:'20px', marginBottom:16,
+              padding:'14px', marginBottom:16,
             }}>
-              <svg viewBox="0 0 940 340" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'auto' }}>
+              <svg viewBox="0 0 940 320" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'auto' }}>
                 {/* Edges */}
                 {edges.map(([a,b]) => {
                   const sa = getNodeStatus(a), sb = getNodeStatus(b);
@@ -184,31 +184,31 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
                     <g key={id} transform={`translate(${x},${y})`}>
                       {status==='active' && (
                         <>
-                          <rect x={-66} y={-36} width={132} height={72} rx={13} fill="var(--sage-bg)" opacity={0.3}/>
-                          <rect x={-70} y={-40} width={140} height={80} rx={15} fill="none" stroke="var(--sage-l)" strokeWidth={1} opacity={0.4}/>
+                          <rect x={-56} y={-30} width={112} height={60} rx={11} fill="var(--sage-bg)" opacity={0.3}/>
+                          <rect x={-59} y={-33} width={118} height={66} rx={13} fill="none" stroke="var(--sage-l)" strokeWidth={1} opacity={0.4}/>
                         </>
                       )}
-                      <rect x={-62} y={-34} width={124} height={68} rx={12}
+                      <rect x={-52} y={-28} width={104} height={56} rx={10}
                         fill={status==='done' ? 'var(--sage-bg)' : status==='active' ? 'var(--card)' : 'var(--bg2)'}
-                        stroke={statusColor[status]} strokeWidth={status!=='pending'?2:1}
+                        stroke={statusColor[status]} strokeWidth={status!=='pending'?1.5:1}
                       />
                       {/* 顶部色条 */}
-                      <rect x={-62} y={-34} width={124} height={3} rx={12}
+                      <rect x={-52} y={-28} width={104} height={2.5} rx={10}
                         fill={statusColor[status]}
                       />
                       {/* ID */}
-                      <text x={-52} y={-18} fontSize={9} fill="var(--text-l)" fontWeight="700">{id}</text>
+                      <text x={-43} y={-14} fontSize={8} fill="var(--text-l)" fontWeight="700">{id}</text>
                       {/* 状态点 */}
-                      <circle cx={52} cy={-22} r={7}
+                      <circle cx={43} cy={-17} r={6}
                         fill={status==='done' ? 'var(--green-ok)' : status==='active' ? 'var(--sage)' : 'var(--border)'}
                       />
-                      {status==='done' && <text x={48} y={-18} fontSize={8} fill="white">✓</text>}
+                      {status==='done' && <text x={39.5} y={-13.5} fontSize={7} fill="white">✓</text>}
                       {/* Label */}
-                      <text x={0} y={-4} textAnchor="middle" fontSize={13} fontWeight="700"
+                      <text x={0} y={-1} textAnchor="middle" fontSize={11} fontWeight="700"
                         fill={status==='done' ? 'var(--sage)' : status==='active' ? 'var(--text-d)' : 'var(--text-l)'}
                         fontFamily="'Noto Serif SC',serif"
                       >{label}</text>
-                      <text x={0} y={14} textAnchor="middle" fontSize={10} fill="var(--text-l)"
+                      <text x={0} y={14} textAnchor="middle" fontSize={9} fill="var(--text-l)"
                         fontFamily="'Noto Serif SC',serif"
                       >{sub}</text>
                     </g>
@@ -266,12 +266,12 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
           {/* 右：JSON 实时输出 */}
           <div style={{
-            flex:'0 0 320px', background:'var(--card)',
+            flex:'0 0 400px', background:'var(--card)',
             borderRadius:14, border:'1px solid var(--border)',
             boxShadow:'var(--shadow)',
             borderTop:'2px solid var(--taupe)',
             display:'flex', flexDirection:'column',
-            maxHeight: 520,
+            height: 520,
           }}>
             <div style={{ padding:'14px 16px 8px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
               <span style={{ fontSize:12, color:'var(--text-l)' }}>
