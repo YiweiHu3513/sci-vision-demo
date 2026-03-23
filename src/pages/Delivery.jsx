@@ -328,18 +328,20 @@ function SlideCarousel() {
     <button
       onClick={() => scroll(dir)}
       style={{
-        position:'absolute', top:'50%', [dir === -1 ? 'left' : 'right']:0,
+        position:'absolute', top:'50%', [dir === -1 ? 'left' : 'right']:-4,
         transform:'translateY(-50%)', zIndex:2,
-        width:24, height:24, borderRadius:'50%',
+        width:22, height:22, borderRadius:'50%',
         background:'var(--card)', border:'1px solid var(--border)',
-        boxShadow:'0 2px 8px rgba(0,0,0,0.1)',
+        boxShadow:'0 2px 6px rgba(0,0,0,0.08)',
         display:'flex', alignItems:'center', justifyContent:'center',
-        cursor:'pointer', fontSize:11, color:'var(--text-m)',
+        cursor:'pointer', padding:0,
         opacity: show ? 1 : 0, pointerEvents: show ? 'auto' : 'none',
         transition:'opacity 0.2s',
       }}
     >
-      {dir === -1 ? '‹' : '›'}
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ display:'block' }}>
+        <path d={dir === -1 ? 'M6.5 2L3.5 5L6.5 8' : 'M3.5 2L6.5 5L3.5 8'} stroke="var(--text-m)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
     </button>
   );
 
