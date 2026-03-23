@@ -16,6 +16,11 @@ const slides = [
   { title:'实验设计', color:'var(--taupe)' },
   { title:'结果分析', color:'var(--lav)' },
   { title:'结论展望', color:'#ACA08A' },
+  { title:'数据可视化', color:'var(--sage)' },
+  { title:'模型架构', color:'var(--dust)' },
+  { title:'对比实验', color:'var(--taupe)' },
+  { title:'消融分析', color:'var(--lav)' },
+  { title:'未来工作', color:'#ACA08A' },
 ];
 
 const resolutions = [
@@ -297,6 +302,96 @@ function UpgradeToast({ resolution }) {
 }
 
 
+/* ── 幻灯片横向滚动预览 ── */
+function SlideCarousel() {
+  const scrollRef = useRef(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(true);
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
+  };
+
+  useEffect(() => { checkScroll(); }, []);
+
+  const scroll = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * 260, behavior:'smooth' });
+  };
+
+  const arrowBtn = (dir, show) => (
+    <button
+      onClick={() => scroll(dir)}
+      style={{
+        position:'absolute', top:'50%', [dir === -1 ? 'left' : 'right']:0,
+        transform:'translateY(-50%)', zIndex:2,
+        width:28, height:28, borderRadius:'50%',
+        background:'var(--card)', border:'1px solid var(--border)',
+        boxShadow:'0 2px 8px rgba(0,0,0,0.1)',
+        display:'flex', alignItems:'center', justifyContent:'center',
+        cursor:'pointer', fontSize:12, color:'var(--text-m)',
+        opacity: show ? 1 : 0, pointerEvents: show ? 'auto' : 'none',
+        transition:'opacity 0.2s',
+      }}
+    >
+      {dir === -1 ? '‹' : '›'}
+    </button>
+  );
+
+  return (
+    <div style={{ marginTop:16 }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+        <div style={{ fontSize:13, fontWeight:700 }}>幻灯片预览</div>
+        <div style={{ fontSize:11, color:'var(--text-l)' }}>{slides.length} 张</div>
+      </div>
+      <div style={{ position:'relative' }}>
+        {arrowBtn(-1, canLeft)}
+        {arrowBtn(1, canRight)}
+        {/* 左右渐隐遮罩 */}
+        {canLeft && <div style={{ position:'absolute', left:0, top:0, bottom:0, width:32, background:'linear-gradient(to right, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'10px 0 0 10px' }}/>}
+        {canRight && <div style={{ position:'absolute', right:0, top:0, bottom:0, width:32, background:'linear-gradient(to left, var(--bg), transparent)', zIndex:1, pointerEvents:'none', borderRadius:'0 10px 10px 0' }}/>}
+        <div
+          ref={scrollRef}
+          onScroll={checkScroll}
+          className="no-scrollbar"
+          style={{
+            display:'flex', gap:10, overflowX:'auto', padding:'2px 4px 6px',
+          }}
+        >
+          {slides.map((s,i) => (
+            <div key={i} style={{
+              flex:'0 0 120px', borderRadius:10, overflow:'hidden',
+              border:'1px solid var(--border)',
+              boxShadow:'var(--shadow)', background:'var(--card)',
+              cursor:'pointer', transition:'transform 0.15s, box-shadow 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='var(--shadow)'; }}
+            >
+              <div style={{ height:3, background:s.color }}/>
+              <div style={{
+                height:60,
+                background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
+                padding:'8px',
+              }}>
+                <div style={{ fontSize:10, fontWeight:700, color:s.color }}>{String(i+1).padStart(2,'0')}</div>
+                <div style={{ height:1, background:`${s.color}40`, margin:'4px 0' }}/>
+                <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
+                <div style={{ height:1, background:'var(--border)', width:'80%' }}/>
+              </div>
+              <div style={{ fontSize:9, color:'var(--text-m)', padding:'4px 8px 6px' }}>{s.title}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
   const [progress] = useState(37.5);
   const [currentRes, setCurrentRes] = useState(resolutions[0]); // 默认720p
@@ -457,32 +552,8 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
             </div>
           </div>
 
-          {/* PPT 缩略图 */}
-          <div style={{ marginTop:16 }}>
-            <div style={{ fontSize:13, fontWeight:700, marginBottom:10 }}>幻灯片预览</div>
-            <div style={{ display:'flex', gap:10 }}>
-              {slides.map((s,i) => (
-                <div key={i} style={{
-                  flex:1, borderRadius:10, overflow:'hidden',
-                  border:'1px solid var(--border)',
-                  boxShadow:'var(--shadow)', background:'var(--card)',
-                }}>
-                  <div style={{ height:3, background:s.color }}/>
-                  <div style={{
-                    height:60,
-                    background:`linear-gradient(135deg, ${s.color}22, ${s.color}11)`,
-                    padding:'8px',
-                  }}>
-                    <div style={{ fontSize:10, fontWeight:700, color:s.color }}>0{i+1}</div>
-                    <div style={{ height:1, background:`${s.color}40`, margin:'4px 0' }}/>
-                    <div style={{ height:1, background:'var(--border)', marginBottom:3 }}/>
-                    <div style={{ height:1, background:'var(--border)', width:'80%' }}/>
-                  </div>
-                  <div style={{ fontSize:9, color:'var(--text-m)', padding:'4px 8px 6px' }}>{s.title}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* PPT 缩略图 - 横向滚动 */}
+          <SlideCarousel />
         </div>
 
         {/* 右侧面板 */}
