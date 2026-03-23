@@ -411,7 +411,7 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout }) {
                 <div style={{ fontSize:11, color:'#706860', letterSpacing:2 }}>⏮  ⏯  ⏭&nbsp;&nbsp;&nbsp;&nbsp;🔊</div>
                 <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                   {/* 倍速选择 */}
-                  <div ref={speedRef} style={{ position:'relative' }}>
+                  <div ref={speedRef} style={{ position:'relative', display:'flex', alignItems:'center' }}>
                     <button
                       onClick={() => setShowSpeedMenu(v => !v)}
                       style={{
