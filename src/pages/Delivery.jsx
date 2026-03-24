@@ -1014,33 +1014,33 @@ export default function Delivery({
             <div style={{
               borderRadius: 14, border: '1px solid var(--border)',
               background: 'var(--card)', boxShadow: 'var(--shadow)',
-              display: 'flex', overflow: 'hidden',
+              display: 'grid', gridTemplateColumns: '280px 1fr',
+              overflow: 'hidden', maxHeight: '65vh',
             }}>
               {/* Left: poster preview */}
               <div style={{
-                flex: '0 0 45%', background: '#f0eeeb', padding: 12,
+                background: '#f0eeeb', padding: 12,
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
-                borderRight: '1px solid var(--border)',
+                borderRight: '1px solid var(--border)', overflow: 'hidden',
               }}>
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8, alignSelf: 'flex-start' }}>海报预览</div>
                 <img
                   src={DEMO_ASSETS.poster.url} alt="海报"
                   onClick={() => setShowPosterPreview(true)}
                   style={{
-                    width: '100%', maxHeight: '55vh', objectFit: 'contain',
-                    borderRadius: 8, border: '1px solid var(--border)',
-                    cursor: 'pointer',
+                    width: '100%', flex: 1, minHeight: 0,
+                    objectFit: 'contain', borderRadius: 8,
+                    border: '1px solid var(--border)', cursor: 'pointer',
                   }}
                 />
                 <div style={{ fontSize: 9, color: 'var(--text-l)', marginTop: 6 }}>点击放大查看</div>
               </div>
               {/* Right: adjustment panel */}
-              <div style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto' }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>海报调整</div>
                 <div style={{ fontSize: 11, color: 'var(--text-m)', lineHeight: 1.6 }}>
                   如需修改海报内容，可选择调整方向后重新生成。
                 </div>
-                {/* Style select */}
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>视觉风格</div>
                   <select style={{
@@ -1055,20 +1055,18 @@ export default function Delivery({
                     <option>信息图 — 数据可视化</option>
                   </select>
                 </div>
-                {/* Text correction */}
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>文字修改说明</div>
                   <textarea
                     placeholder="例如：标题改为中文、去掉二维码、补充作者信息…"
                     style={{
-                      width: '100%', minHeight: 70, padding: '8px 10px', borderRadius: 8,
+                      width: '100%', minHeight: 60, padding: '8px 10px', borderRadius: 8,
                       border: '1px solid var(--border)', background: 'var(--bg)',
                       fontSize: 11, fontFamily: 'inherit', color: 'var(--text)',
                       resize: 'vertical', lineHeight: 1.5,
                     }}
                   />
                 </div>
-                {/* Layout */}
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>版面方向</div>
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -1083,9 +1081,8 @@ export default function Delivery({
                     ))}
                   </div>
                 </div>
-                {/* Regen button */}
                 <button style={{
-                  marginTop: 'auto', padding: '11px', borderRadius: 10,
+                  marginTop: 8, padding: '11px', borderRadius: 10,
                   background: 'var(--sage)', border: 'none', color: '#fff',
                   fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
                 }}>↻ 重新生成海报</button>
