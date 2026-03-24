@@ -306,14 +306,14 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
             <div
               ref={codeRef}
               style={{
-                flex:1, overflowY:'hidden', padding:'10px 16px 10px',
+                flex:1, overflow:'hidden', padding:'10px 16px 10px',
                 fontFamily:"'SF Mono', Menlo, Consolas, monospace", fontSize:10.5, lineHeight:1.8,
               }}
             >
               {allCodeLines.slice(0, visibleLines).map(([line, cls], i) => (
                 <div key={i} style={{
                   color: lineColor[cls] || 'var(--text-l)',
-                  whiteSpace: 'pre',
+                  whiteSpace: 'pre-wrap', wordBreak: 'break-all',
                   animation: i >= visibleLines - 3 ? 'typeLine .3s ease both' : 'none',
                   minHeight: cls === 'blank' ? 8 : undefined,
                 }}>
