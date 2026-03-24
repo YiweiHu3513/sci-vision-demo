@@ -71,6 +71,9 @@ const lineColor = {
 };
 
 const imgColors = ['#B2C0B8','#A6B4C4','#BCA8A0','#ACA0C4','#B6C0AE','#A0B4C0','#C0B2A6'];
+const DAG_CANVAS_HEIGHT = 320;
+const ASSET_CARD_HEIGHT = 118;
+const MAX_ASSET_SLOTS = 8;
 
 export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
   const [progress, setProgress] = useState(0);
@@ -135,6 +138,10 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
   };
 
   const statusColor = { done:'var(--sage)', active:'var(--sage)', pending:'var(--border)' };
+  const visibleAssetCount = Math.min(assetCount, 7);
+  const showPendingCard = assetCount < 10;
+  const usedSlots = visibleAssetCount + (showPendingCard ? 1 : 0);
+  const ghostSlots = Math.max(0, MAX_ASSET_SLOTS - usedSlots);
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
@@ -162,59 +169,61 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
               border:'1px solid var(--border)', boxShadow:'var(--shadow)',
               padding:'14px', marginBottom:16,
             }}>
-              <svg viewBox="0 0 940 320" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'auto' }}>
-                {/* Edges */}
-                {edges.map(([a,b]) => {
-                  const sa = getNodeStatus(a), sb = getNodeStatus(b);
-                  const done_e = sa==='done'&&sb==='done';
-                  const act_e = (sa==='done'&&sb==='active')||(sa==='active');
-                  return (
-                    <path key={a+b} d={bezier(a,b)}
-                      fill="none"
-                      stroke={done_e ? 'var(--sage)' : act_e ? 'var(--sage-l)' : 'var(--border)'}
-                      strokeWidth={done_e||act_e ? 2 : 1.5}
-                      opacity={done_e ? 1 : act_e ? 0.8 : 0.6}
-                    />
-                  );
-                })}
-                {/* Nodes */}
-                {nodes.map(({ id, label, sub, x, y }) => {
-                  const status = getNodeStatus(id);
-                  return (
-                    <g key={id} transform={`translate(${x},${y})`}>
-                      {status==='active' && (
-                        <>
-                          <rect x={-56} y={-30} width={112} height={60} rx={11} fill="var(--sage-bg)" opacity={0.3}/>
-                          <rect x={-59} y={-33} width={118} height={66} rx={13} fill="none" stroke="var(--sage-l)" strokeWidth={1} opacity={0.4}/>
-                        </>
-                      )}
-                      <rect x={-52} y={-28} width={104} height={56} rx={10}
-                        fill={status==='done' ? 'var(--sage-bg)' : status==='active' ? 'var(--card)' : 'var(--bg2)'}
-                        stroke={statusColor[status]} strokeWidth={status!=='pending'?1.5:1}
+              <div style={{ height: DAG_CANVAS_HEIGHT, overflow: 'hidden' }}>
+                <svg viewBox="0 0 940 320" preserveAspectRatio="xMidYMid meet" style={{ display:'block', width:'100%', height:'100%' }}>
+                  {/* Edges */}
+                  {edges.map(([a,b]) => {
+                    const sa = getNodeStatus(a), sb = getNodeStatus(b);
+                    const done_e = sa==='done'&&sb==='done';
+                    const act_e = (sa==='done'&&sb==='active')||(sa==='active');
+                    return (
+                      <path key={a+b} d={bezier(a,b)}
+                        fill="none"
+                        stroke={done_e ? 'var(--sage)' : act_e ? 'var(--sage-l)' : 'var(--border)'}
+                        strokeWidth={done_e||act_e ? 2 : 1.5}
+                        opacity={done_e ? 1 : act_e ? 0.8 : 0.6}
                       />
-                      {/* 顶部色条 */}
-                      <rect x={-52} y={-28} width={104} height={2.5} rx={10}
-                        fill={statusColor[status]}
-                      />
-                      {/* ID */}
-                      <text x={-43} y={-14} fontSize={8} fill="var(--text-l)" fontWeight="700">{id}</text>
-                      {/* 状态点 */}
-                      <circle cx={43} cy={-17} r={6}
-                        fill={status==='done' ? 'var(--green-ok)' : status==='active' ? 'var(--sage)' : 'var(--border)'}
-                      />
-                      {status==='done' && <text x={39.5} y={-13.5} fontSize={7} fill="white">✓</text>}
-                      {/* Label */}
-                      <text x={0} y={-1} textAnchor="middle" fontSize={11} fontWeight="700"
-                        fill={status==='done' ? 'var(--sage)' : status==='active' ? 'var(--text-d)' : 'var(--text-l)'}
-                        fontFamily="'Noto Serif SC',serif"
-                      >{label}</text>
-                      <text x={0} y={14} textAnchor="middle" fontSize={9} fill="var(--text-l)"
-                        fontFamily="'Noto Serif SC',serif"
-                      >{sub}</text>
-                    </g>
-                  );
-                })}
-              </svg>
+                    );
+                  })}
+                  {/* Nodes */}
+                  {nodes.map(({ id, label, sub, x, y }) => {
+                    const status = getNodeStatus(id);
+                    return (
+                      <g key={id} transform={`translate(${x},${y})`}>
+                        {status==='active' && (
+                          <>
+                            <rect x={-56} y={-30} width={112} height={60} rx={11} fill="var(--sage-bg)" opacity={0.3}/>
+                            <rect x={-59} y={-33} width={118} height={66} rx={13} fill="none" stroke="var(--sage-l)" strokeWidth={1} opacity={0.4}/>
+                          </>
+                        )}
+                        <rect x={-52} y={-28} width={104} height={56} rx={10}
+                          fill={status==='done' ? 'var(--sage-bg)' : status==='active' ? 'var(--card)' : 'var(--bg2)'}
+                          stroke={statusColor[status]} strokeWidth={status!=='pending'?1.5:1}
+                        />
+                        {/* 顶部色条 */}
+                        <rect x={-52} y={-28} width={104} height={2.5} rx={10}
+                          fill={statusColor[status]}
+                        />
+                        {/* ID */}
+                        <text x={-43} y={-14} fontSize={8} fill="var(--text-l)" fontWeight="700">{id}</text>
+                        {/* 状态点 */}
+                        <circle cx={43} cy={-17} r={6}
+                          fill={status==='done' ? 'var(--green-ok)' : status==='active' ? 'var(--sage)' : 'var(--border)'}
+                        />
+                        {status==='done' && <text x={39.5} y={-13.5} fontSize={7} fill="white">✓</text>}
+                        {/* Label */}
+                        <text x={0} y={-1} textAnchor="middle" fontSize={11} fontWeight="700"
+                          fill={status==='done' ? 'var(--sage)' : status==='active' ? 'var(--text-d)' : 'var(--text-l)'}
+                          fontFamily="'Noto Serif SC',serif"
+                        >{label}</text>
+                        <text x={0} y={14} textAnchor="middle" fontSize={9} fill="var(--text-l)"
+                          fontFamily="'Noto Serif SC',serif"
+                        >{sub}</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
             </div>
 
             {/* 拍立得资产 */}
@@ -225,15 +234,16 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
               <div style={{ fontSize:13, fontWeight:700, marginBottom:12 }}>
                 资产生成 Step-C — {Math.min(assetCount, 7)} / 10
               </div>
-              <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-                {imgColors.slice(0, assetCount).map((c, i) => (
+              <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignContent:'flex-start' }}>
+                {imgColors.slice(0, visibleAssetCount).map((c, i) => (
                   <div key={i} style={{
                     width:120, borderRadius:8,
                     background:'var(--card)',
                     border:'1px solid var(--border)',
                     boxShadow:'var(--shadow)',
                     overflow:'hidden', position:'relative',
-                    animation: i===assetCount-1 ? 'fadeIn .4s ease' : 'none',
+                    animation: i===visibleAssetCount-1 ? 'fadeIn .4s ease' : 'none',
+                    willChange: i===visibleAssetCount-1 ? 'opacity' : 'auto',
                   }}>
                     <div style={{ height:88, background:c }}/>
                     <div style={{ padding:'6px 8px', fontSize:9, color:'var(--text-l)' }}>asset_{String(i+1).padStart(2,'0')}.png</div>
@@ -246,7 +256,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
                     }}>✓</div>
                   </div>
                 ))}
-                {assetCount < 10 && (
+                {showPendingCard && (
                   <div style={{
                     width:120, height:118, borderRadius:8,
                     border:'1.5px dashed var(--border-s)',
@@ -260,6 +270,17 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
                     </div>
                   </div>
                 )}
+                {Array.from({ length: ghostSlots }).map((_, i) => (
+                  <div
+                    key={`ghost-${i}`}
+                    style={{
+                      width:120,
+                      height:ASSET_CARD_HEIGHT,
+                      visibility:'hidden',
+                      pointerEvents:'none',
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -313,7 +334,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
         </div>
       </div>
       <style>{`
-        @keyframes fadeIn { from { opacity:0; transform:scale(.9); } to { opacity:1; transform:scale(1); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         @keyframes typeLine { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
         @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
       `}</style>
