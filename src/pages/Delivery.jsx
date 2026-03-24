@@ -439,6 +439,131 @@ function SlideCarousel() {
   );
 }
 
+function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl, pptFilename }) {
+  const marked = markedSlides.size;
+  return (
+    <div style={{
+      borderRadius: 16, border: '1px solid var(--border)',
+      background: 'var(--card)', boxShadow: 'var(--shadow)',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '12px 16px', borderBottom: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 14, fontWeight: 700 }}>PPT 逐页预览</span>
+          <span style={{
+            fontSize: 10, color: 'var(--text-l)',
+            background: 'var(--bg)', borderRadius: 6, padding: '2px 8px',
+          }}>{slides.length} 页</span>
+          {marked > 0 && (
+            <span style={{
+              fontSize: 10, color: '#C45C5C', fontWeight: 700,
+              background: 'rgba(196,92,92,0.08)', borderRadius: 6, padding: '2px 8px',
+            }}>已选 {marked} 页待重新生成</span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {marked > 0 && (
+            <button onClick={onRegenMarked} style={{
+              fontSize: 11, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+              color: '#fff', background: '#C45C5C', border: 'none',
+              borderRadius: 8, padding: '5px 14px',
+            }}>
+              ↻ 重新生成 {marked} 页
+            </button>
+          )}
+          <a href={pptUrl} download={pptFilename} style={{
+            fontSize: 11, color: 'var(--sage)', textDecoration: 'none',
+            border: '1px solid var(--sage)', borderRadius: 8, padding: '5px 14px', fontWeight: 700,
+          }}>下载 PPTX</a>
+        </div>
+      </div>
+      {/* Tip */}
+      <div style={{
+        padding: '8px 16px', fontSize: 11, color: 'var(--text-l)',
+        background: 'var(--bg)', borderBottom: '1px solid var(--border)',
+      }}>
+        💡 点击卡片标记需要重新生成的页面，选完后点击「重新生成」
+      </div>
+      {/* Grid */}
+      <div style={{
+        padding: 16,
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gap: 14,
+      }}>
+        {slides.map((s, i) => {
+          const isMarked = markedSlides.has(i);
+          return (
+            <div
+              key={i}
+              onClick={() => onToggleMark(i)}
+              style={{
+                borderRadius: 12, overflow: 'hidden', cursor: 'pointer',
+                border: isMarked ? '2px solid #C45C5C' : '1px solid var(--border)',
+                boxShadow: isMarked ? '0 0 0 3px rgba(196,92,92,0.15)' : 'var(--shadow)',
+                background: 'var(--card)',
+                transition: 'all 0.15s',
+                position: 'relative',
+              }}
+            >
+              {/* Mark badge */}
+              {isMarked && (
+                <div style={{
+                  position: 'absolute', top: 8, right: 8, zIndex: 2,
+                  width: 22, height: 22, borderRadius: '50%',
+                  background: '#C45C5C', color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 700,
+                }}>↻</div>
+              )}
+              {/* Slide preview area */}
+              <div style={{
+                aspectRatio: '16/9',
+                background: `linear-gradient(135deg, ${s.color}25, ${s.color}10, var(--bg))`,
+                display: 'flex', flexDirection: 'column',
+                justifyContent: 'center', alignItems: 'center',
+                padding: 16, position: 'relative',
+              }}>
+                <div style={{
+                  fontSize: 28, fontWeight: 800, color: s.color, opacity: 0.2,
+                  position: 'absolute', top: 8, left: 12,
+                }}>{String(i + 1).padStart(2, '0')}</div>
+                {/* Mock slide content lines */}
+                <div style={{ width: '80%' }}>
+                  <div style={{ height: 3, background: s.color, borderRadius: 2, marginBottom: 6, opacity: 0.6, width: '70%' }}/>
+                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4 }}/>
+                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4, width: '90%' }}/>
+                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4, width: '75%' }}/>
+                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, width: '60%' }}/>
+                </div>
+              </div>
+              {/* Footer */}
+              <div style={{
+                padding: '8px 12px', borderTop: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: s.color }}>第 {i + 1} 页</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-m)' }}>{s.title}</div>
+                </div>
+                <div style={{
+                  fontSize: 9, padding: '2px 6px', borderRadius: 4,
+                  background: isMarked ? 'rgba(196,92,92,0.1)' : 'var(--bg)',
+                  color: isMarked ? '#C45C5C' : 'var(--text-l)',
+                  fontWeight: 600,
+                }}>{isMarked ? '待重生成' : '满意'}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 const ctrlBtnStyle = {
   background: 'rgba(255,255,255,0.08)',
   border: '1px solid rgba(255,255,255,0.12)',
@@ -465,6 +590,8 @@ export default function Delivery({
   const [speed, setSpeed] = useState('1x');
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showPosterPreview, setShowPosterPreview] = useState(false);
+  const [markedSlides, setMarkedSlides] = useState(new Set());
+  const [regenToast, setRegenToast] = useState(false);
 
   const videoRef = useRef(null);
   const speedRef = useRef(null);
@@ -838,38 +965,21 @@ export default function Delivery({
           )}
 
           {showPpt && activeMedia === 'ppt' && (
-            <div style={{
-              borderRadius: 16, overflow: 'hidden',
-              border: '1px solid var(--border)', background: 'var(--card)',
-              boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column',
-            }}>
-              {/* Header */}
-              <div style={{
-                padding: '10px 16px', borderBottom: '1px solid var(--border)',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 18 }}>📊</span>
-                  <span style={{ fontSize: 13, fontWeight: 700 }}>PPT 演示文稿预览</span>
-                  <span style={{ fontSize: 10, color: 'var(--text-l)', background: 'var(--bg)', borderRadius: 6, padding: '2px 8px' }}>
-                    {slides.length} 页
-                  </span>
-                </div>
-                <a href={DEMO_ASSETS.ppt.url} download={DEMO_ASSETS.ppt.filename} style={{
-                  fontSize: 11, color: 'var(--sage)', textDecoration: 'none',
-                  border: '1px solid var(--sage)', borderRadius: 8, padding: '4px 12px', fontWeight: 700,
-                }}>下载 PPTX</a>
-              </div>
-              {/* Embedded Office Online viewer */}
-              <div style={{ width: '100%', aspectRatio: '16/9', background: '#f0eeeb', position: 'relative' }}>
-                <iframe
-                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + DEMO_ASSETS.ppt.url)}`}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
-                  title="PPT 预览"
-                  allowFullScreen
-                />
-              </div>
-            </div>
+            <PptGridView
+              slides={slides}
+              markedSlides={markedSlides}
+              onToggleMark={(i) => setMarkedSlides(prev => {
+                const next = new Set(prev);
+                if (next.has(i)) next.delete(i); else next.add(i);
+                return next;
+              })}
+              onRegenMarked={() => {
+                setRegenToast(true);
+                setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000);
+              }}
+              pptUrl={DEMO_ASSETS.ppt.url}
+              pptFilename={DEMO_ASSETS.ppt.filename}
+            />
           )}
           {showPpt && activeMedia === 'all' && <SlideCarousel />}
 
@@ -1048,6 +1158,16 @@ export default function Delivery({
           }}
         >
           正在升级至 {pendingRes?.label || currentRes.label}，请稍候…
+        </div>
+      )}
+
+      {regenToast && (
+        <div style={{
+          position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 140,
+          padding: '12px 24px', borderRadius: 12, background: '#C45C5C', color: '#fff',
+          fontSize: 13, fontWeight: 600, boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+        }}>
+          正在重新生成选中页面，请稍候…
         </div>
       )}
     </div>
