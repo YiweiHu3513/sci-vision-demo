@@ -1,30 +1,37 @@
 // 纯 SVG 科研图标背景装饰
+/*
+ *  viewBox = 0 0 1440 900
+ *  Grid: 6 columns × 5 rows, icons spread evenly with slight offsets to avoid rigid grid look
+ *  Left margin icons: ~60-120,  Right margin icons: ~1300-1400
+ *  Top: ~60-140,  Bottom: ~740-860
+ */
 const icons = [
-  // DNA
-  { id: 'dna1',  x: 60,   y: 140, size: 80,  color: '#648C6C', opacity: 0.18 },
-  { id: 'dna2',  x: 1300, y: 460, size: 68,  color: '#6482A0', opacity: 0.15 },
-  // 六边形
-  { id: 'hex1',  x: 300,  y: 80,  size: 52,  color: '#6482A0', opacity: 0.14 },
-  { id: 'hex2',  x: 1100, y: 820, size: 48,  color: '#948270', opacity: 0.14 },
-  { id: 'hex3',  x: 1360, y: 160, size: 60,  color: '#8A7CA0', opacity: 0.14 },
-  // 原子
-  { id: 'atom1', x: 70,   y: 620, size: 80,  color: '#948270', opacity: 0.14 },
-  { id: 'atom2', x: 1180, y: 140, size: 68,  color: '#8A7CA0', opacity: 0.12 },
-  // 细胞
-  { id: 'cell1', x: 1370, y: 360, size: 64,  color: '#648C6C', opacity: 0.16 },
-  { id: 'cell2', x: 940,  y: 840, size: 56,  color: '#648C6C', opacity: 0.13 },
-  // 分子
-  { id: 'mol1',  x: 560,  y: 72,  size: 50,  color: '#648C6C', opacity: 0.13 },
-  { id: 'mol2',  x: 1350, y: 760, size: 58,  color: '#6482A0', opacity: 0.13 },
-  // 锥形瓶
-  { id: 'fla1',  x: 55,   y: 810, size: 64,  color: '#648C6C', opacity: 0.15 },
-  { id: 'fla2',  x: 560,  y: 848, size: 56,  color: '#6482A0', opacity: 0.13 },
-  // 抗体
-  { id: 'ant1',  x: 1090, y: 55,  size: 60,  color: '#948270', opacity: 0.13 },
-  { id: 'ant2',  x: 280,  y: 840, size: 66,  color: '#648C6C', opacity: 0.13 },
-  // 蛋白
-  { id: 'pro1',  x: 220,  y: 810, size: 74,  color: '#948270', opacity: 0.13 },
-  { id: 'pro2',  x: 810,  y: 855, size: 68,  color: '#8A7CA0', opacity: 0.12 },
+  // ── Row 1 (top): y ~60–150 ──
+  { id: 'hex1',  x: 80,   y: 90,   size: 52,  color: '#6482A0', opacity: 0.13 },
+  { id: 'mol1',  x: 380,  y: 68,   size: 48,  color: '#648C6C', opacity: 0.12 },
+  { id: 'ant1',  x: 720,  y: 55,   size: 56,  color: '#948270', opacity: 0.11 },
+  { id: 'hex3',  x: 1060, y: 80,   size: 54,  color: '#8A7CA0', opacity: 0.12 },
+  { id: 'dna2',  x: 1360, y: 110,  size: 64,  color: '#6482A0', opacity: 0.14 },
+
+  // ── Row 2 (upper-mid): y ~220–340 ──
+  { id: 'dna1',  x: 65,   y: 260,  size: 78,  color: '#648C6C', opacity: 0.16 },
+  { id: 'cell1', x: 1380, y: 300,  size: 60,  color: '#648C6C', opacity: 0.14 },
+
+  // ── Row 3 (mid): y ~400–520 ──
+  { id: 'atom2', x: 90,   y: 460,  size: 66,  color: '#8A7CA0', opacity: 0.12 },
+  { id: 'pro2',  x: 1340, y: 480,  size: 62,  color: '#8A7CA0', opacity: 0.11 },
+
+  // ── Row 4 (lower-mid): y ~580–700 ──
+  { id: 'atom1', x: 70,   y: 640,  size: 74,  color: '#948270', opacity: 0.13 },
+  { id: 'hex2',  x: 1370, y: 660,  size: 50,  color: '#948270', opacity: 0.12 },
+
+  // ── Row 5 (bottom): y ~760–870 ──
+  { id: 'fla1',  x: 60,   y: 800,  size: 62,  color: '#648C6C', opacity: 0.14 },
+  { id: 'pro1',  x: 320,  y: 830,  size: 68,  color: '#948270', opacity: 0.12 },
+  { id: 'fla2',  x: 620,  y: 850,  size: 52,  color: '#6482A0', opacity: 0.11 },
+  { id: 'cell2', x: 920,  y: 840,  size: 54,  color: '#648C6C', opacity: 0.12 },
+  { id: 'mol2',  x: 1200, y: 820,  size: 56,  color: '#6482A0', opacity: 0.12 },
+  { id: 'ant2',  x: 1400, y: 860,  size: 58,  color: '#648C6C', opacity: 0.11 },
 ];
 
 function DnaIcon({ x, y, size, color, opacity }) {
@@ -176,7 +183,7 @@ function ProteinIcon({ x, y, size, color, opacity }) {
 
 export default function SciBgIcons() {
   return (
-    <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:0 }}>
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', zIndex:0 }}>
       {icons.map(({ id, x, y, size, color, opacity }) => {
         if (id.startsWith('dna'))  return <DnaIcon key={id} x={x} y={y} size={size} color={color} opacity={opacity}/>;
         if (id.startsWith('hex'))  return <HexIcon key={id} x={x} y={y} size={size} color={color} opacity={opacity}/>;
