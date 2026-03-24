@@ -837,7 +837,41 @@ export default function Delivery({
             </div>
           )}
 
-          {showPpt && <SlideCarousel />}
+          {showPpt && activeMedia === 'ppt' && (
+            <div style={{
+              borderRadius: 16, overflow: 'hidden',
+              border: '1px solid var(--border)', background: 'var(--card)',
+              boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column',
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: '10px 16px', borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>📊</span>
+                  <span style={{ fontSize: 13, fontWeight: 700 }}>PPT 演示文稿预览</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-l)', background: 'var(--bg)', borderRadius: 6, padding: '2px 8px' }}>
+                    {slides.length} 页
+                  </span>
+                </div>
+                <a href={DEMO_ASSETS.ppt.url} download={DEMO_ASSETS.ppt.filename} style={{
+                  fontSize: 11, color: 'var(--sage)', textDecoration: 'none',
+                  border: '1px solid var(--sage)', borderRadius: 8, padding: '4px 12px', fontWeight: 700,
+                }}>下载 PPTX</a>
+              </div>
+              {/* Embedded Office Online viewer */}
+              <div style={{ width: '100%', aspectRatio: '16/9', background: '#f0eeeb', position: 'relative' }}>
+                <iframe
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + DEMO_ASSETS.ppt.url)}`}
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  title="PPT 预览"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          )}
+          {showPpt && activeMedia === 'all' && <SlideCarousel />}
 
           {showPosterPanel && (
             <div
