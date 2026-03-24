@@ -306,9 +306,8 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
             <div
               ref={codeRef}
               style={{
-                flex:1, overflowY:'auto', padding:'10px 16px 10px',
+                flex:1, overflowY:'hidden', padding:'10px 16px 10px',
                 fontFamily:"'SF Mono', Menlo, Consolas, monospace", fontSize:10.5, lineHeight:1.8,
-                scrollBehavior:'smooth',
               }}
             >
               {allCodeLines.slice(0, visibleLines).map(([line, cls], i) => (
