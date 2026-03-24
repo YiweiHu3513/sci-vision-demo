@@ -739,7 +739,7 @@ export default function Delivery({
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, padding: '0 24px 16px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 16, padding: '0 24px 16px', alignItems: 'start' }}>
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
@@ -1014,7 +1014,7 @@ export default function Delivery({
             <div style={{
               borderRadius: 14, border: '1px solid var(--border)',
               background: 'var(--card)', boxShadow: 'var(--shadow)',
-              display: 'grid', gridTemplateColumns: '280px 1fr',
+              display: 'grid', gridTemplateColumns: '320px 1fr',
               overflow: 'hidden', maxHeight: '65vh',
             }}>
               {/* Left: poster preview */}
@@ -1137,12 +1137,12 @@ export default function Delivery({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
             {stats.map(([k, v]) => (
               <div key={k} style={{
-                padding: '8px 10px', borderRadius: 8,
+                padding: '6px 8px', borderRadius: 8,
                 background: 'var(--bg)', border: '1px solid var(--border)',
-                textAlign: 'center',
+                textAlign: 'center', whiteSpace: 'nowrap',
               }}>
-                <div style={{ fontSize: 9, color: 'var(--text-l)', marginBottom: 1 }}>{k}</div>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>{v}</div>
+                <div style={{ fontSize: 8, color: 'var(--text-l)', marginBottom: 1 }}>{k}</div>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>{v}</div>
               </div>
             ))}
           </div>
