@@ -1,8 +1,17 @@
 import { useState } from 'react';
+import EditableText from './EditableText';
 
-export default function Navbar({ showLogin = false, user, onOpenAuth, onLogout }) {
+export default function Navbar({
+  showLogin = false, user, onOpenAuth, onLogout,
+  // Library integration
+  onNavLibrary, activeNav,
+  // Project name (workflow view)
+  projectName, onProjectNameChange,
+}) {
   const [dropOpen, setDropOpen] = useState(false);
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || '用户';
+
+  const navItems = ['产品','案例','项目库','定价','关于'];
 
   return (
     <nav style={{
@@ -13,6 +22,7 @@ export default function Navbar({ showLogin = false, user, onOpenAuth, onLogout }
       display: 'flex', alignItems: 'center',
       padding: '0 32px',
     }}>
+      {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{
           width: 16, height: 16, borderRadius: '50%',
@@ -20,14 +30,47 @@ export default function Navbar({ showLogin = false, user, onOpenAuth, onLogout }
         }} />
         <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1 }}>SCI·VISION</span>
       </div>
+
+      {/* Project name — shown in workflow view */}
+      {projectName && onProjectNameChange && (
+        <div style={{ display:'flex', alignItems:'center', gap:6, marginLeft:16 }}>
+          <span style={{ color:'var(--text-l)', fontSize:13 }}>‹</span>
+          <EditableText
+            value={projectName}
+            onChange={onProjectNameChange}
+            style={{ fontSize:13, color:'var(--text-m)', maxWidth:260, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}
+            inputStyle={{ width:240 }}
+          />
+          <span style={{ color:'var(--text-l)', fontSize:13 }}>›</span>
+        </div>
+      )}
+
       <div style={{ flex: 1 }} />
-      <div style={{ display: 'flex', gap: 40, marginRight: 32 }}>
-        {['产品','案例','定价','关于'].map(item => (
-          <a key={item} href="#" style={{ fontSize: 13, color: 'var(--text-l)', textDecoration: 'none' }}>{item}</a>
+
+      {/* Nav links */}
+      <div style={{ display: 'flex', gap: 36, marginRight: 32 }}>
+        {navItems.map(item => (
+          <a
+            key={item}
+            href="#"
+            onClick={e => {
+              e.preventDefault();
+              if (item === '项目库' && onNavLibrary) onNavLibrary();
+            }}
+            style={{
+              fontSize: 13,
+              color: activeNav === item ? 'var(--sage)' : 'var(--text-l)',
+              textDecoration: 'none',
+              fontWeight: activeNav === item ? 700 : 400,
+              transition: 'color .15s',
+            }}
+            onMouseEnter={e => { if (activeNav !== item) e.currentTarget.style.color = 'var(--text-m)'; }}
+            onMouseLeave={e => { if (activeNav !== item) e.currentTarget.style.color = 'var(--text-l)'; }}
+          >{item}</a>
         ))}
       </div>
 
-      {/* 未登录 */}
+      {/* Auth: not logged in */}
       {showLogin && !user && (
         <button
           onClick={onOpenAuth}
@@ -39,7 +82,7 @@ export default function Navbar({ showLogin = false, user, onOpenAuth, onLogout }
         >登录 / 注册</button>
       )}
 
-      {/* 已登录 */}
+      {/* Auth: logged in */}
       {user && (
         <div style={{ position: 'relative' }}>
           <button
@@ -64,7 +107,6 @@ export default function Navbar({ showLogin = false, user, onOpenAuth, onLogout }
 
           {dropOpen && (
             <>
-              {/* 点外部关闭 */}
               <div
                 style={{ position: 'fixed', inset: 0, zIndex: 98 }}
                 onClick={() => setDropOpen(false)}

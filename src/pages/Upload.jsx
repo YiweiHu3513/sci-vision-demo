@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import SciBgIcons from '../components/SciBgIcons';
 
-export default function Upload({ onNext, user, onOpenAuth, onLogout }) {
+export default function Upload({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [tab, setTab] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [input, setInput] = useState('');
@@ -28,7 +28,7 @@ export default function Upload({ onNext, user, onOpenAuth, onLogout }) {
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
       <SciBgIcons />
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <Navbar showLogin user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
+        <Navbar showLogin user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
 
         {/* 上段：Badge + 标题 */}
         <div style={{ textAlign: 'center', paddingTop: 32 }}>

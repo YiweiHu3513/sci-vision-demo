@@ -137,7 +137,7 @@ function calcEstimate(configs) {
   return { timeStr: timeStr.trim(), pts: totalPts };
 }
 
-export default function Config({ onNext, user, onOpenAuth, onLogout }) {
+export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [configs, setConfigs] = useState(INITIAL);
 
   const update = (label, val) => {
@@ -148,7 +148,7 @@ export default function Config({ onNext, user, onOpenAuth, onLogout }) {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column' }}>
-      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
       <StepBar active={2} />
 
       {/* Main content area — fill remaining viewport, no scroll needed */}

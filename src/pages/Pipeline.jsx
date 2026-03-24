@@ -75,7 +75,7 @@ const DAG_CANVAS_HEIGHT = 320;
 const ASSET_CARD_HEIGHT = 118;
 const MAX_ASSET_SLOTS = 8;
 
-export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
+export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [progress, setProgress] = useState(0);
   const [activeNode, setActiveNode] = useState(2); // C is active
   const [doneNodes, setDoneNodes] = useState([0,1]); // A, B done
@@ -145,7 +145,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout }) {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
-      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} />
+      <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
       <StepBar active={3} />
 
       <div style={{ padding:'12px 24px' }}>
