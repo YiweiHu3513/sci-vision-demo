@@ -439,6 +439,15 @@ function SlideCarousel() {
   );
 }
 
+const ctrlBtnStyle = {
+  background: 'rgba(255,255,255,0.08)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: 5, padding: '2px 8px',
+  fontSize: 11, fontWeight: 600,
+  color: '#A8A4A0', cursor: 'pointer',
+  fontFamily: 'inherit', lineHeight: 1.4,
+};
+
 export default function Delivery({
   onReset,
   user,
@@ -462,6 +471,14 @@ export default function Delivery({
   const progressRef = useRef(null);
   const [duration, setDuration] = useState(30);
   const [currentTime, setCurrentTime] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [muted, setMuted] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const playerWrapRef = useRef(null);
+  const overlayTimer = useRef(null);
 
   useEffect(() => {
     const close = (e) => {
@@ -477,6 +494,53 @@ export default function Delivery({
       videoRef.current.playbackRate = rate;
     }
   }, [speed]);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) { videoRef.current.play(); setPlaying(true); }
+    else { videoRef.current.pause(); setPlaying(false); }
+  };
+
+  const flashOverlay = () => {
+    setShowOverlay(true);
+    clearTimeout(overlayTimer.current);
+    overlayTimer.current = setTimeout(() => setShowOverlay(false), 600);
+  };
+
+  const seekTo = (e) => {
+    if (!videoRef.current || !progressRef.current) return;
+    const rect = progressRef.current.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    videoRef.current.currentTime = p * duration;
+  };
+
+  const handleProgressDrag = (e) => {
+    if (!dragging) return;
+    seekTo(e);
+  };
+
+  useEffect(() => {
+    const up = () => setDragging(false);
+    const move = (e) => { if (dragging) seekTo(e); };
+    window.addEventListener('mouseup', up);
+    window.addEventListener('mousemove', move);
+    return () => { window.removeEventListener('mouseup', up); window.removeEventListener('mousemove', move); };
+  });
+
+  const toggleFullscreen = () => {
+    if (!playerWrapRef.current) return;
+    if (!document.fullscreenElement) {
+      playerWrapRef.current.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  };
+
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
 
   const handleResChange = (r) => {
     if (r.label === currentRes.label) return;
@@ -586,17 +650,21 @@ export default function Delivery({
 
           {showVideo && (
             <div
+              ref={playerWrapRef}
               style={{
                 borderRadius: 16,
                 overflow: 'hidden',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
                 border: '1px solid #2A2826',
                 background: '#0E0D0C',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
+              {/* Top bar */}
               <div
                 style={{
-                  padding: '10px 14px',
+                  padding: '8px 14px',
                   background: '#161412',
                   borderBottom: '1px solid #2A2826',
                   display: 'flex',
@@ -605,150 +673,164 @@ export default function Delivery({
                 }}
               >
                 <span style={{ fontSize: 12, color: '#A8A4A0', fontWeight: 700 }}>样本视频预览</span>
-                <a
-                  href={DEMO_ASSETS.video.url}
-                  download={DEMO_ASSETS.video.filename}
-                  style={{
-                    fontSize: 11,
-                    color: '#C5D4C8',
-                    textDecoration: 'none',
-                    border: '1px solid rgba(140,175,148,0.45)',
-                    borderRadius: 8,
-                    padding: '3px 10px',
-                    fontWeight: 700,
-                  }}
-                >
-                  下载视频
-                </a>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color: '#8CAF94',
+                    background: 'rgba(100,140,108,0.12)', border: '1px solid rgba(100,140,108,0.25)',
+                    borderRadius: 6, padding: '2px 8px',
+                  }}>{currentRes.label} 预览</span>
+                  <a
+                    href={DEMO_ASSETS.video.url}
+                    download={DEMO_ASSETS.video.filename}
+                    style={{
+                      fontSize: 11, color: '#C5D4C8', textDecoration: 'none',
+                      border: '1px solid rgba(140,175,148,0.45)', borderRadius: 8,
+                      padding: '2px 10px', fontWeight: 700,
+                    }}
+                  >下载</a>
+                </div>
               </div>
 
-              <video
-                ref={videoRef}
-                controls
-                preload="metadata"
-                poster={DEMO_ASSETS.poster.url}
-                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 30)}
-                onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-                style={{
-                  width: '100%',
-                  display: 'block',
-                  aspectRatio: '2.2 / 1',
-                  background: '#0E0D0C',
-                }}
+              {/* Video area — no native controls */}
+              <div
+                onClick={() => { togglePlay(); flashOverlay(); }}
+                style={{ position: 'relative', cursor: 'pointer', background: '#0E0D0C', lineHeight: 0 }}
               >
-                <source src={DEMO_ASSETS.video.url} type="video/mp4" />
-                您的浏览器不支持 video 标签。
-              </video>
-
-              <div style={{ background: '#161412', padding: '10px 14px 12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, color: '#706860', minWidth: 38 }}>{formatTime(currentTime)}</span>
-                  <div
-                    ref={progressRef}
-                    onClick={(e) => {
-                      if (!videoRef.current || !progressRef.current) return;
-                      const rect = progressRef.current.getBoundingClientRect();
-                      const p = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-                      videoRef.current.currentTime = p * duration;
-                    }}
-                    style={{ flex: 1, height: 4, background: '#302E2C', borderRadius: 2, position: 'relative', cursor: 'pointer' }}
-                  >
-                    <div style={{ width: `${progress}%`, height: '100%', background: 'var(--sage-l)', borderRadius: 2 }} />
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: `${progress}%`,
-                        width: 12,
-                        height: 12,
-                        borderRadius: '50%',
-                        background: '#E8E4DC',
-                        transform: 'translate(-50%,-50%)',
-                      }}
-                    />
+                <video
+                  ref={videoRef}
+                  preload="metadata"
+                  poster={DEMO_ASSETS.poster.url}
+                  onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 30)}
+                  onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+                  onPlay={() => setPlaying(true)}
+                  onPause={() => setPlaying(false)}
+                  onEnded={() => setPlaying(false)}
+                  style={{ width: '100%', display: 'block', background: '#0E0D0C' }}
+                >
+                  <source src={DEMO_ASSETS.video.url} type="video/mp4" />
+                </video>
+                {/* Big play/pause overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: showOverlay || !playing ? 1 : 0,
+                  transition: 'opacity 0.3s',
+                  pointerEvents: 'none',
+                  background: !playing && currentTime === 0 ? 'rgba(0,0,0,0.3)' : 'transparent',
+                }}>
+                  <div style={{
+                    width: 56, height: 56, borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: showOverlay ? 1 : (!playing ? 0.9 : 0),
+                    transform: showOverlay ? 'scale(1)' : 'scale(0.8)',
+                    transition: 'all 0.25s',
+                  }}>
+                    <span style={{ color: '#E8E4DC', fontSize: 22, marginLeft: playing ? 0 : 3 }}>
+                      {playing ? '⏸' : '▶'}
+                    </span>
                   </div>
-                  <span style={{ fontSize: 11, color: '#706860', minWidth: 38, textAlign: 'right' }}>{formatTime(duration)}</span>
+                </div>
+              </div>
+
+              {/* Custom control bar */}
+              <div style={{ background: '#161412', padding: '8px 14px 10px' }}>
+                {/* Progress bar */}
+                <div
+                  ref={progressRef}
+                  onMouseDown={(e) => { setDragging(true); seekTo(e); }}
+                  style={{
+                    height: 14, display: 'flex', alignItems: 'center',
+                    cursor: 'pointer', marginBottom: 6, position: 'relative',
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute', left: 0, right: 0, top: '50%', transform: 'translateY(-50%)',
+                    height: 4, background: '#302E2C', borderRadius: 2,
+                  }}>
+                    <div style={{
+                      width: `${progress}%`, height: '100%',
+                      background: 'linear-gradient(90deg, var(--sage), var(--sage-l))',
+                      borderRadius: 2, transition: dragging ? 'none' : 'width 0.15s',
+                    }}/>
+                  </div>
+                  <div style={{
+                    position: 'absolute', top: '50%',
+                    left: `${progress}%`,
+                    width: 12, height: 12, borderRadius: '50%',
+                    background: '#E8E4DC', border: '2px solid var(--sage)',
+                    transform: 'translate(-50%,-50%)',
+                    transition: dragging ? 'none' : 'left 0.15s',
+                    boxShadow: '0 0 6px rgba(100,140,108,0.4)',
+                  }}/>
                 </div>
 
+                {/* Controls row */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: 11, color: '#706860', letterSpacing: 1.4 }}>⏮  ⏯  ⏭&nbsp;&nbsp;&nbsp;&nbsp;🔊</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div ref={speedRef} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                      <button
-                        onClick={() => setShowSpeedMenu((v) => !v)}
-                        style={{
-                          padding: '2px 8px',
-                          borderRadius: 5,
-                          fontSize: 11,
-                          fontWeight: 600,
-                          background: 'rgba(255,255,255,0.08)',
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          color: '#A8A4A0',
-                          cursor: 'pointer',
-                          fontFamily: 'inherit',
-                        }}
-                      >
-                        {speed}
+                  {/* Left: time + play controls */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 11, color: '#706860', fontFamily: 'monospace', minWidth: 75 }}>
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+                    <button onClick={() => { if (videoRef.current) videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10); }}
+                      style={ctrlBtnStyle} title="后退 10s">⏮</button>
+                    <button onClick={togglePlay} style={{ ...ctrlBtnStyle, fontSize: 14, padding: '2px 6px' }}>
+                      {playing ? '⏸' : '▶'}
+                    </button>
+                    <button onClick={() => { if (videoRef.current) videoRef.current.currentTime = Math.min(duration, videoRef.current.currentTime + 10); }}
+                      style={ctrlBtnStyle} title="前进 10s">⏭</button>
+
+                    {/* Volume */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <button onClick={() => { setMuted(v => !v); if (videoRef.current) videoRef.current.muted = !muted; }}
+                        style={ctrlBtnStyle}>
+                        {muted || volume === 0 ? '🔇' : '🔊'}
                       </button>
+                      <input
+                        type="range" min={0} max={1} step={0.05}
+                        value={muted ? 0 : volume}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          setVolume(v); setMuted(v === 0);
+                          if (videoRef.current) { videoRef.current.volume = v; videoRef.current.muted = v === 0; }
+                        }}
+                        style={{ width: 50, accentColor: 'var(--sage)', cursor: 'pointer', height: 3 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right: speed, CC, resolution, fullscreen */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div ref={speedRef} style={{ position: 'relative' }}>
+                      <button onClick={() => setShowSpeedMenu(v => !v)} style={ctrlBtnStyle}>{speed}</button>
                       {showSpeedMenu && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            bottom: 'calc(100% + 6px)',
-                            right: 0,
-                            background: '#1E1C1A',
-                            border: '1px solid #3A3836',
-                            borderRadius: 8,
-                            padding: 4,
-                            zIndex: 10,
-                            boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                          }}
-                        >
-                          {speeds.map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => {
-                                setSpeed(s);
-                                setShowSpeedMenu(false);
-                              }}
+                        <div style={{
+                          position: 'absolute', bottom: 'calc(100% + 6px)', right: 0,
+                          background: '#1E1C1A', border: '1px solid #3A3836',
+                          borderRadius: 8, padding: 4, zIndex: 10,
+                          boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                        }}>
+                          {speeds.map(s => (
+                            <button key={s}
+                              onClick={() => { setSpeed(s); setShowSpeedMenu(false); }}
                               style={{
-                                display: 'block',
-                                width: '100%',
-                                padding: '6px 16px',
-                                border: 'none',
-                                borderRadius: 5,
-                                fontSize: 11,
-                                fontWeight: 600,
+                                display: 'block', width: '100%', padding: '6px 16px',
+                                border: 'none', borderRadius: 5, fontSize: 11, fontWeight: 600,
                                 background: s === speed ? 'rgba(100,140,108,0.2)' : 'transparent',
                                 color: s === speed ? '#8CAF94' : '#A8A4A0',
-                                cursor: 'pointer',
-                                fontFamily: 'inherit',
-                                textAlign: 'center',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
+                                cursor: 'pointer', fontFamily: 'inherit', textAlign: 'center',
+                              }}>
                               {s}
                             </button>
                           ))}
                         </div>
                       )}
                     </div>
-                    <button
-                      style={{
-                        padding: '2px 8px',
-                        borderRadius: 5,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        background: 'rgba(255,255,255,0.08)',
-                        border: '1px solid rgba(255,255,255,0.12)',
-                        color: '#A8A4A0',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      CC
-                    </button>
+                    <button style={ctrlBtnStyle}>CC</button>
                     <ResolutionPicker current={currentRes} onChange={handleResChange} />
+                    <button onClick={toggleFullscreen} style={ctrlBtnStyle} title="全屏">
+                      {isFullscreen ? '⊡' : '⛶'}
+                    </button>
                   </div>
                 </div>
               </div>
