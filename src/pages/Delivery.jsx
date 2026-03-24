@@ -714,7 +714,6 @@ export default function Delivery({
       color: '#ACA08A',
       href: DEMO_ASSETS.poster.url,
       download: DEMO_ASSETS.poster.filename,
-      preview: true,
     },
     { key: 'pdf', icon: '≡', label: '下载分镜脚本 PDF', sub: '暂未上传样本', color: 'var(--taupe)' },
     { key: 'share', icon: '⬡', label: '生成分享链接', sub: '暂未启用', color: 'var(--lav)' },
@@ -1012,22 +1011,85 @@ export default function Delivery({
           )}
 
           {showPosterPanel && (
-            <div
-              style={{
-                marginTop: 14,
-                borderRadius: 14,
-                border: '1px solid var(--border)',
-                background: 'var(--card)',
-                boxShadow: 'var(--shadow)',
-                padding: 12,
-              }}
-            >
-              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>海报预览（当前样本）</div>
-              <img
-                src={DEMO_ASSETS.poster.url}
-                alt="海报预览"
-                style={{ width: '100%', borderRadius: 10, border: '1px solid var(--border)' }}
-              />
+            <div style={{
+              borderRadius: 14, border: '1px solid var(--border)',
+              background: 'var(--card)', boxShadow: 'var(--shadow)',
+              display: 'flex', overflow: 'hidden',
+            }}>
+              {/* Left: poster preview */}
+              <div style={{
+                flex: '0 0 45%', background: '#f0eeeb', padding: 12,
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                borderRight: '1px solid var(--border)',
+              }}>
+                <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8, alignSelf: 'flex-start' }}>海报预览</div>
+                <img
+                  src={DEMO_ASSETS.poster.url} alt="海报"
+                  onClick={() => setShowPosterPreview(true)}
+                  style={{
+                    width: '100%', maxHeight: '55vh', objectFit: 'contain',
+                    borderRadius: 8, border: '1px solid var(--border)',
+                    cursor: 'pointer',
+                  }}
+                />
+                <div style={{ fontSize: 9, color: 'var(--text-l)', marginTop: 6 }}>点击放大查看</div>
+              </div>
+              {/* Right: adjustment panel */}
+              <div style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>海报调整</div>
+                <div style={{ fontSize: 11, color: 'var(--text-m)', lineHeight: 1.6 }}>
+                  如需修改海报内容，可选择调整方向后重新生成。
+                </div>
+                {/* Style select */}
+                <div>
+                  <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>视觉风格</div>
+                  <select style={{
+                    width: '100%', padding: '8px 10px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--bg)',
+                    fontSize: 12, fontFamily: 'inherit', color: 'var(--text)',
+                  }}>
+                    <option>当前风格（保持不变）</option>
+                    <option>学术简洁 — 白底黑字</option>
+                    <option>科技感 — 深色渐变</option>
+                    <option>杂志风 — 大图排版</option>
+                    <option>信息图 — 数据可视化</option>
+                  </select>
+                </div>
+                {/* Text correction */}
+                <div>
+                  <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>文字修改说明</div>
+                  <textarea
+                    placeholder="例如：标题改为中文、去掉二维码、补充作者信息…"
+                    style={{
+                      width: '100%', minHeight: 70, padding: '8px 10px', borderRadius: 8,
+                      border: '1px solid var(--border)', background: 'var(--bg)',
+                      fontSize: 11, fontFamily: 'inherit', color: 'var(--text)',
+                      resize: 'vertical', lineHeight: 1.5,
+                    }}
+                  />
+                </div>
+                {/* Layout */}
+                <div>
+                  <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>版面方向</div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {['A3 竖版（当前）', 'A3 横版', '方形 1:1'].map((opt, i) => (
+                      <button key={opt} style={{
+                        flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 10, fontWeight: 600,
+                        border: i === 0 ? '1.5px solid var(--sage)' : '1px solid var(--border)',
+                        background: i === 0 ? 'rgba(100,140,108,0.06)' : 'var(--bg)',
+                        color: i === 0 ? 'var(--sage)' : 'var(--text-m)',
+                        fontFamily: 'inherit', cursor: 'pointer',
+                      }}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+                {/* Regen button */}
+                <button style={{
+                  marginTop: 'auto', padding: '11px', borderRadius: 10,
+                  background: 'var(--sage)', border: 'none', color: '#fff',
+                  fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+                }}>↻ 重新生成海报</button>
+              </div>
             </div>
           )}
         </div>
@@ -1050,53 +1112,26 @@ export default function Delivery({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 12,
-                padding: '14px',
-                borderRadius: 12,
+                gap: 8,
+                padding: '10px 12px',
+                borderRadius: 10,
                 border: '1px solid var(--border)',
                 background: 'var(--card2)',
-                marginBottom: i === dynamicExport.length - 1 ? 0 : 10,
+                marginBottom: i === dynamicExport.length - 1 ? 0 : 6,
                 position: 'relative',
                 overflow: 'hidden',
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: 4,
-                  background: item.color,
-                  borderRadius: '12px 0 0 12px',
-                }}
-              />
-              <span style={{ fontSize: 20, color: item.color, marginLeft: 6 }}>{item.icon}</span>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700 }}>{item.label}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-m)' }}>{item.sub}</div>
+              <div style={{
+                position: 'absolute', left: 0, top: 0, bottom: 0,
+                width: 3, background: item.color, borderRadius: '10px 0 0 10px',
+              }}/>
+              <span style={{ fontSize: 16, color: item.color, marginLeft: 4 }}>{item.icon}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</div>
+                <div style={{ fontSize: 9, color: 'var(--text-l)', whiteSpace: 'nowrap' }}>{item.sub}</div>
               </div>
-
-              <div style={{ display: 'flex', gap: 8 }}>
-                {item.preview && (
-                  <button
-                    onClick={() => setShowPosterPreview(true)}
-                    style={{
-                      padding: '6px 14px',
-                      borderRadius: 9,
-                      fontSize: 11,
-                      border: `1px solid ${item.color}`,
-                      background: 'var(--bg)',
-                      color: item.color,
-                      fontFamily: 'inherit',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    预览
-                  </button>
-                )}
-                <ExportAction item={item} />
-              </div>
+              <ExportAction item={item} />
             </div>
           ))}
 
