@@ -177,7 +177,7 @@ export default function App() {
             {step === 1 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
             {step === 2 && <Config   onNext={() => goTo(3)} {...navProps} />}
             {step === 3 && <Pipeline onNext={() => goTo(4)} {...navProps} />}
-            {step === 4 && <Delivery onReset={() => switchView('library')} {...navProps} />}
+            {step === 4 && <Delivery onReset={handleNewProject} {...navProps} />}
           </>
         )}
       </div>

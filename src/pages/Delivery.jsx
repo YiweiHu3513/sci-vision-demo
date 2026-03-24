@@ -599,7 +599,7 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout, onNavLib
               background:'var(--bg)', border:'1px solid var(--border)',
               borderRadius:12, fontSize:14, fontWeight:700,
               color:'var(--text-m)', fontFamily:'inherit', cursor:'pointer',
-            }}>+ 新建项目</button>
+            }}>+ 解读下一篇</button>
           </div>
         </div>
       </div>
