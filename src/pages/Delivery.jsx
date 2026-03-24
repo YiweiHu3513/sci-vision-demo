@@ -705,7 +705,7 @@ export default function Delivery({
                   onPlay={() => setPlaying(true)}
                   onPause={() => setPlaying(false)}
                   onEnded={() => setPlaying(false)}
-                  style={{ width: '100%', display: 'block', background: '#0E0D0C' }}
+                  style={{ width: '100%', display: 'block', background: '#0E0D0C', maxHeight: '50vh' }}
                 >
                   <source src={DEMO_ASSETS.video.url} type="video/mp4" />
                 </video>
