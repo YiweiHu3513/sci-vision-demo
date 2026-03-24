@@ -24,4 +24,7 @@ dist-ssr
 *.sw?
 .vercel
 .env*.local
-public/demo-samples/
+public/demo-samples/*
+!public/demo-samples/llm-agents-video-demo.mp4
+!public/demo-samples/llm-agents-deck.pptx
+!public/demo-samples/llm-agents-poster.png
