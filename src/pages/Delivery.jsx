@@ -740,8 +740,8 @@ export default function Delivery({
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>
       </div>
 
-      <div style={{ display: 'flex', gap: 16, padding: '0 24px 16px', alignItems: 'stretch' }}>
-        <div style={{ flex: '0 0 56%', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16, padding: '0 24px 16px', alignItems: 'start' }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -981,7 +981,35 @@ export default function Delivery({
               pptFilename={DEMO_ASSETS.ppt.filename}
             />
           )}
-          {showPpt && activeMedia === 'all' && <SlideCarousel />}
+          {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
+          {activeMedia === 'all' && (
+            <div style={{ display: 'flex', gap: 14, marginTop: 14, minHeight: 0 }}>
+              {/* Poster thumbnail */}
+              <div
+                onClick={() => setShowPosterPreview(true)}
+                style={{
+                  flex: '0 0 140px', borderRadius: 12, overflow: 'hidden',
+                  border: '1px solid var(--border)', background: 'var(--card)',
+                  boxShadow: 'var(--shadow)', cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column',
+                  transition: 'box-shadow 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
+              >
+                <img src={DEMO_ASSETS.poster.url} alt="海报" style={{
+                  width: '100%', display: 'block', borderBottom: '1px solid var(--border)',
+                }}/>
+                <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
+                  🖼 海报预览
+                </div>
+              </div>
+              {/* PPT carousel */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <SlideCarousel />
+              </div>
+            </div>
+          )}
 
           {showPosterPanel && (
             <div
@@ -1006,16 +1034,15 @@ export default function Delivery({
 
         <div
           style={{
-            flex: 1,
             background: 'var(--card)',
             borderRadius: 14,
             border: '1px solid var(--border)',
             boxShadow: 'var(--shadow)',
             borderTop: '2px solid var(--sage)',
-            padding: '20px',
+            padding: '16px',
           }}
         >
-          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 14 }}>导出与分享</div>
+          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12 }}>导出与分享</div>
 
           {dynamicExport.map((item, i) => (
             <div
@@ -1073,59 +1100,34 @@ export default function Delivery({
             </div>
           ))}
 
-          <div style={{ margin: '16px 0 8px', fontSize: 11, color: 'var(--text-l)' }}>本次生成统计</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 16 }}>
+          {/* Compact stats row */}
+          <div style={{ margin: '14px 0 8px', fontSize: 10, color: 'var(--text-l)' }}>本次生成统计</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
             {stats.map(([k, v]) => (
-              <div
-                key={k}
-                style={{
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 2 }}>{k}</div>
-                <div style={{ fontSize: 16, fontWeight: 700 }}>{v}</div>
+              <div key={k} style={{
+                padding: '8px 10px', borderRadius: 8,
+                background: 'var(--bg)', border: '1px solid var(--border)',
+                textAlign: 'center',
+              }}>
+                <div style={{ fontSize: 9, color: 'var(--text-l)', marginBottom: 1 }}>{k}</div>
+                <div style={{ fontSize: 13, fontWeight: 700 }}>{v}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button
-              onClick={onNavLibrary}
-              style={{
-                flex: 1,
-                padding: '13px',
-                background: 'var(--sage)',
-                border: 'none',
-                borderRadius: 12,
-                fontSize: 14,
-                fontWeight: 700,
-                color: '#fff',
-                fontFamily: 'inherit',
-                cursor: 'pointer',
-              }}
-            >
-              ← 回到项目库
-            </button>
-            <button
-              onClick={onReset}
-              style={{
-                flex: 1,
-                padding: '13px',
-                background: 'var(--bg)',
-                border: '1px solid var(--border)',
-                borderRadius: 12,
-                fontSize: 14,
-                fontWeight: 700,
-                color: 'var(--text-m)',
-                fontFamily: 'inherit',
-                cursor: 'pointer',
-              }}
-            >
-              + 解读下一篇
-            </button>
+          {/* Stacked buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <button onClick={onNavLibrary} style={{
+              padding: '11px', background: 'var(--sage)', border: 'none',
+              borderRadius: 10, fontSize: 13, fontWeight: 700,
+              color: '#fff', fontFamily: 'inherit', cursor: 'pointer',
+            }}>← 回到项目库</button>
+            <button onClick={onReset} style={{
+              padding: '11px', background: 'var(--bg)',
+              border: '1px solid var(--border)', borderRadius: 10,
+              fontSize: 13, fontWeight: 700, color: 'var(--text-m)',
+              fontFamily: 'inherit', cursor: 'pointer',
+            }}>+ 解读下一篇</button>
           </div>
         </div>
       </div>
