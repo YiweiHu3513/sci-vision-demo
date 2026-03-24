@@ -218,34 +218,29 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
           }}>
             <div style={{ fontWeight:700, fontSize:13, marginBottom:12 }}>视频生成配置</div>
 
-            {/* 2-column config grid */}
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px 14px', flex:1 }}>
-              {/* Left column fields */}
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {LEFT_FIELDS.map(label => (
+            {/* 2-column config grid — paired rows so left/right always align */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'10px 14px', flex:1, alignItems:'start' }}>
+              {LEFT_FIELDS.map((lLabel, i) => {
+                const rLabel = RIGHT_FIELDS[i];
+                return [
                   <SelectField
-                    key={label}
-                    label={label}
-                    value={configs[label].val}
-                    fromChat={configs[label].fromChat}
-                    options={OPTIONS[label]}
-                    onChange={(v) => update(label, v)}
-                  />
-                ))}
-              </div>
-              {/* Right column fields */}
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {RIGHT_FIELDS.map(label => (
+                    key={lLabel}
+                    label={lLabel}
+                    value={configs[lLabel].val}
+                    fromChat={configs[lLabel].fromChat}
+                    options={OPTIONS[lLabel]}
+                    onChange={(v) => update(lLabel, v)}
+                  />,
                   <SelectField
-                    key={label}
-                    label={label}
-                    value={configs[label].val}
-                    fromChat={configs[label].fromChat}
-                    options={OPTIONS[label]}
-                    onChange={(v) => update(label, v)}
-                  />
-                ))}
-              </div>
+                    key={rLabel}
+                    label={rLabel}
+                    value={configs[rLabel].val}
+                    fromChat={configs[rLabel].fromChat}
+                    options={OPTIONS[rLabel]}
+                    onChange={(v) => update(rLabel, v)}
+                  />,
+                ];
+              })}
             </div>
 
             {/* AI suggestion + button — always at bottom */}

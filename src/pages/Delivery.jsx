@@ -354,23 +354,42 @@ export default function Delivery({ onReset, user, onOpenAuth, onLogout, onNavLib
             ))}
           </div>
 
-          <button
-            onClick={onReset}
-            style={{
-              width: '100%',
-              padding: '13px',
-              background: 'var(--bg)',
-              border: '1px solid var(--border)',
-              borderRadius: 12,
-              fontSize: 14,
-              fontWeight: 700,
-              color: 'var(--text-m)',
-              fontFamily: 'inherit',
-              cursor: 'pointer',
-            }}
-          >
-            + 新建项目
-          </button>
+          <div style={{ display:'flex', gap:10 }}>
+            <button
+              onClick={onNavLibrary}
+              style={{
+                flex:1,
+                padding: '13px',
+                background: 'var(--sage)',
+                border: 'none',
+                borderRadius: 12,
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#fff',
+                fontFamily: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              ← 回到项目库
+            </button>
+            <button
+              onClick={onReset}
+              style={{
+                flex:1,
+                padding: '13px',
+                background: 'var(--bg)',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                fontSize: 14,
+                fontWeight: 700,
+                color: 'var(--text-m)',
+                fontFamily: 'inherit',
+                cursor: 'pointer',
+              }}
+            >
+              + 新建项目
+            </button>
+          </div>
         </div>
       </div>
     </div>
