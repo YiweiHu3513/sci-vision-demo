@@ -3,20 +3,12 @@ import Navbar from '../components/Navbar';
 import StepBar from '../components/StepBar';
 import { DEMO_ASSETS } from '../config/demoAssets';
 
-const slides = [
-  { title: '第 1 页', color: 'var(--sage)' },
-  { title: '第 2 页', color: 'var(--dust)' },
-  { title: '第 3 页', color: 'var(--taupe)' },
-  { title: '第 4 页', color: 'var(--lav)' },
-  { title: '第 5 页', color: '#ACA08A' },
-  { title: '第 6 页', color: 'var(--sage)' },
-  { title: '第 7 页', color: 'var(--dust)' },
-  { title: '第 8 页', color: 'var(--taupe)' },
-  { title: '第 9 页', color: 'var(--lav)' },
-  { title: '第 10 页', color: '#ACA08A' },
-  { title: '第 11 页', color: 'var(--sage)' },
-  { title: '第 12 页', color: 'var(--dust)' },
-];
+const slidePalette = ['var(--sage)', 'var(--dust)', 'var(--taupe)', 'var(--lav)', '#ACA08A'];
+const slides = Array.from({ length: 12 }, (_, i) => ({
+  title: `第 ${i + 1} 页`,
+  color: slidePalette[i % slidePalette.length],
+  thumb: `/demo-samples/ppt-thumbs/slide-${String(i + 1).padStart(2, '0')}.png`,
+}));
 
 const stats = [
   ['处理时长', '18.3 秒'],
@@ -415,21 +407,24 @@ function SlideCarousel({ compact = false }) {
               <div style={{ height: 3, background: s.color }} />
               <div
                 style={{
-                  flex: 1,
-                  minHeight: 80,
-                  background: `linear-gradient(135deg, ${s.color}18, ${s.color}08)`,
-                  padding: '10px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  position: 'relative',
+                  aspectRatio: '16/9',
+                  background: 'var(--bg)',
+                  overflow: 'hidden',
                 }}
               >
-                <div>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: s.color, marginBottom: 6 }}>{String(i + 1).padStart(2, '0')}</div>
-                  <div style={{ height: 1, background: `${s.color}40`, marginBottom: 4 }} />
-                  <div style={{ height: 1, background: 'var(--border)', marginBottom: 3 }} />
-                  <div style={{ height: 1, background: 'var(--border)', width: '85%', marginBottom: 3 }} />
-                  <div style={{ height: 1, background: 'var(--border)', width: '60%' }} />
+                <img
+                  src={s.thumb}
+                  alt={`${s.title} 缩略图`}
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+                <div style={{
+                  position: 'absolute', left: 8, top: 8,
+                  fontSize: 11, fontWeight: 700, color: '#fff',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.55)',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
                 </div>
               </div>
               <div
@@ -539,22 +534,28 @@ function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl
               {/* Slide preview area */}
               <div style={{
                 aspectRatio: '16/9',
-                background: `linear-gradient(135deg, ${s.color}25, ${s.color}10, var(--bg))`,
-                display: 'flex', flexDirection: 'column',
-                justifyContent: 'center', alignItems: 'center',
-                padding: 16, position: 'relative',
+                background: 'var(--bg)',
+                position: 'relative',
+                overflow: 'hidden',
               }}>
+                <img
+                  src={s.thumb}
+                  alt={`${s.title} 缩略图`}
+                  loading="lazy"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                    filter: isMarked ? 'saturate(0.9) brightness(0.85)' : 'none',
+                  }}
+                />
                 <div style={{
-                  fontSize: 28, fontWeight: 800, color: s.color, opacity: 0.2,
-                  position: 'absolute', top: 8, left: 12,
-                }}>{String(i + 1).padStart(2, '0')}</div>
-                {/* Mock slide content lines */}
-                <div style={{ width: '80%' }}>
-                  <div style={{ height: 3, background: s.color, borderRadius: 2, marginBottom: 6, opacity: 0.6, width: '70%' }}/>
-                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4 }}/>
-                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4, width: '90%' }}/>
-                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, marginBottom: 4, width: '75%' }}/>
-                  <div style={{ height: 2, background: 'var(--border)', borderRadius: 2, width: '60%' }}/>
+                  position: 'absolute', left: 10, top: 8,
+                  fontSize: 11, fontWeight: 700, color: '#fff',
+                  textShadow: '0 2px 8px rgba(0,0,0,0.55)',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
                 </div>
               </div>
               {/* Footer */}
