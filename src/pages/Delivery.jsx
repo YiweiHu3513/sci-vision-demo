@@ -995,7 +995,7 @@ export default function Delivery({
             />
           )}
           {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
-          {(activeMedia === 'all' || activeMedia === 'video') && (
+          {activeMedia === 'all' && (
             <div style={{ display: 'flex', gap: 14, marginTop: 12, minHeight: 0, alignItems: 'stretch' }}>
               {/* Poster thumbnail */}
               <div
