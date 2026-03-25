@@ -636,6 +636,7 @@ export default function Delivery({
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showPosterPreview, setShowPosterPreview] = useState(false);
   const [posterLayout, setPosterLayout] = useState('a3_landscape');
+  const [posterReady, setPosterReady] = useState(() => new Set(['a3_landscape']));
   const [markedSlides, setMarkedSlides] = useState(new Set());
   const [regenToast, setRegenToast] = useState(false);
 
@@ -667,6 +668,29 @@ export default function Delivery({
       videoRef.current.playbackRate = rate;
     }
   }, [speed]);
+
+  // 预加载三种海报版式，减少首次点击切换时的图片加载延迟
+  useEffect(() => {
+    let cancelled = false;
+    POSTER_LAYOUTS.forEach(({ key, url }) => {
+      const markReady = () => {
+        if (cancelled) return;
+        setPosterReady((prev) => {
+          if (prev.has(key)) return prev;
+          const next = new Set(prev);
+          next.add(key);
+          return next;
+        });
+      };
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = markReady;
+      img.onerror = markReady;
+      img.src = url;
+      if (img.complete) markReady();
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -733,6 +757,15 @@ export default function Delivery({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const speeds = ['0.5x', '0.75x', '1x', '1.25x', '1.5x', '2x'];
   const activePoster = POSTER_LAYOUTS.find((item) => item.key === posterLayout) ?? POSTER_LAYOUTS[0];
+  const posterSwitching = !posterReady.has(activePoster.key);
+  const markPosterReady = (key) => {
+    setPosterReady((prev) => {
+      if (prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+  };
 
   const dynamicExport = [
     {
@@ -1071,9 +1104,16 @@ export default function Delivery({
                 onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
                 onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
               >
-                <img src={activePoster.url} alt={`海报（${activePoster.label}）`} style={{
-                  width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
-                }}/>
+                <img
+                  src={activePoster.url}
+                  alt={`海报（${activePoster.label}）`}
+                  loading="eager"
+                  fetchPriority="high"
+                  onLoad={() => markPosterReady(activePoster.key)}
+                  style={{
+                    width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
+                  }}
+                />
                 <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
                   🖼 海报预览
                 </div>
@@ -1105,6 +1145,9 @@ export default function Delivery({
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8, alignSelf: 'flex-start' }}>海报预览</div>
                 <img
                   src={activePoster.url} alt={`海报（${activePoster.label}）`}
+                  loading="eager"
+                  fetchPriority="high"
+                  onLoad={() => markPosterReady(activePoster.key)}
                   onClick={() => setShowPosterPreview(true)}
                   style={{
                     width: '100%', flex: 1, minHeight: 0,
@@ -1168,6 +1211,11 @@ export default function Delivery({
                       );
                     })}
                   </div>
+                  {posterSwitching && (
+                    <div style={{ marginTop: 4, fontSize: 9, color: 'var(--text-l)' }}>
+                      正在加载该版式预览…
+                    </div>
+                  )}
                 </div>
                 <button style={{
                   marginTop: 8, padding: '11px', borderRadius: 10,
