@@ -1150,7 +1150,6 @@ export default function Delivery({
             </div>
           ))}
 
-          <div style={{ flex: 1 }} />
           {/* Compact stats row */}
           <div style={{ margin: '14px 0 8px', fontSize: 10, color: 'var(--text-l)' }}>本次生成统计</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
