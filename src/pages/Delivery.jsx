@@ -1040,18 +1040,22 @@ export default function Delivery({
           )}
 
           {showPosterPanel && (
-            <div style={{
-              borderRadius: 14, border: '1px solid var(--border)',
-              background: 'var(--card)', boxShadow: 'var(--shadow)',
-              display: 'grid', gridTemplateColumns: 'minmax(340px, 42%) minmax(0, 1fr)',
-              overflow: 'hidden', maxHeight: '72vh',
-            }}>
-              {/* Left: poster preview */}
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
               <div style={{
-                background: '#f0eeeb', padding: 12,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                borderRight: '1px solid var(--border)', overflow: 'hidden',
+                borderRadius: 14, border: '1px solid var(--border)',
+                background: 'var(--card)', boxShadow: 'var(--shadow)',
+                display: 'grid', gridTemplateColumns: 'minmax(340px, 42%) minmax(0, 1fr)',
+                overflow: 'hidden',
+                flex: 1,
+                minHeight: 0,
+                height: '100%',
               }}>
+              {/* Left: poster preview */}
+                <div style={{
+                  background: '#f0eeeb', padding: 12,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  borderRight: '1px solid var(--border)', overflow: 'hidden', minHeight: 0,
+                }}>
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8, alignSelf: 'flex-start' }}>海报预览</div>
                 <img
                   src={DEMO_ASSETS.poster.url} alt="海报"
@@ -1065,7 +1069,7 @@ export default function Delivery({
                 <div style={{ fontSize: 9, color: 'var(--text-l)', marginTop: 6 }}>点击放大查看</div>
               </div>
               {/* Right: adjustment panel */}
-              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto', minHeight: 0 }}>
+                <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto', minHeight: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>海报调整</div>
                 <div style={{ fontSize: 11, color: 'var(--text-m)', lineHeight: 1.6 }}>
                   如需修改海报内容，可选择调整方向后重新生成。
@@ -1115,6 +1119,7 @@ export default function Delivery({
                   background: 'var(--sage)', border: 'none', color: '#fff',
                   fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
                 }}>↻ 重新生成海报</button>
+              </div>
               </div>
             </div>
           )}
