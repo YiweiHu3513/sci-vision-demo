@@ -36,7 +36,7 @@ const POSTER_LAYOUTS = [
     label: 'A3 横版',
     url: DEMO_ASSETS.poster.url,
     filename: 'A3横版海报.png',
-    size: '5.8MB',
+    size: '5.9MB',
     meta: 'PNG · A3 横版',
   },
   {
