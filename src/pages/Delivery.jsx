@@ -344,9 +344,9 @@ function PosterPreviewModal({ url, onClose }) {
   );
 }
 
-function SlideCarousel() {
+function SlideCarousel({ compact = false }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, marginTop: 14 }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, marginTop: compact ? 0 : 14 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700 }}>PPT 滚动预览</div>
         <div style={{ fontSize: 10, color: 'var(--text-l)' }}>{slides.length} 张</div>
@@ -739,8 +739,15 @@ export default function Delivery({
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 16, padding: '0 24px 16px', alignItems: 'start' }}>
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) minmax(340px, 360px)',
+        gap: 16,
+        padding: '0 24px 16px',
+        alignItems: 'stretch',
+        minHeight: 'calc(100vh - 190px)',
+      }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div
             style={{
               display: 'inline-flex',
@@ -785,6 +792,7 @@ export default function Delivery({
                 background: '#0E0D0C',
                 display: 'flex',
                 flexDirection: 'column',
+                flex: activeMedia === 'video' ? 1 : '0 0 auto',
               }}
             >
               {/* Top bar */}
@@ -831,7 +839,13 @@ export default function Delivery({
                   onPlay={() => setPlaying(true)}
                   onPause={() => setPlaying(false)}
                   onEnded={() => setPlaying(false)}
-                  style={{ width: '100%', display: 'block', background: '#0E0D0C', maxHeight: '50vh' }}
+                  style={{
+                    width: '100%',
+                    display: 'block',
+                    background: '#0E0D0C',
+                    objectFit: 'contain',
+                    maxHeight: activeMedia === 'all' ? '42vh' : '58vh',
+                  }}
                 >
                   <source src={DEMO_ASSETS.video.url} type="video/mp4" />
                 </video>
@@ -981,13 +995,13 @@ export default function Delivery({
             />
           )}
           {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
-          {activeMedia === 'all' && (
-            <div style={{ display: 'flex', gap: 14, marginTop: 14, minHeight: 0 }}>
+          {(activeMedia === 'all' || activeMedia === 'video') && (
+            <div style={{ display: 'flex', gap: 14, marginTop: 12, minHeight: 0, alignItems: 'stretch' }}>
               {/* Poster thumbnail */}
               <div
                 onClick={() => setShowPosterPreview(true)}
                 style={{
-                  flex: '0 0 140px', borderRadius: 12, overflow: 'hidden',
+                  flex: '0 0 180px', borderRadius: 12, overflow: 'hidden',
                   border: '1px solid var(--border)', background: 'var(--card)',
                   boxShadow: 'var(--shadow)', cursor: 'pointer',
                   display: 'flex', flexDirection: 'column',
@@ -997,7 +1011,7 @@ export default function Delivery({
                 onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
               >
                 <img src={DEMO_ASSETS.poster.url} alt="海报" style={{
-                  width: '100%', display: 'block', borderBottom: '1px solid var(--border)',
+                  width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
                 }}/>
                 <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
                   🖼 海报预览
@@ -1005,7 +1019,7 @@ export default function Delivery({
               </div>
               {/* PPT carousel */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <SlideCarousel />
+                <SlideCarousel compact />
               </div>
             </div>
           )}
@@ -1014,8 +1028,8 @@ export default function Delivery({
             <div style={{
               borderRadius: 14, border: '1px solid var(--border)',
               background: 'var(--card)', boxShadow: 'var(--shadow)',
-              display: 'grid', gridTemplateColumns: '320px 1fr',
-              overflow: 'hidden', maxHeight: '65vh',
+              display: 'grid', gridTemplateColumns: 'minmax(340px, 42%) minmax(0, 1fr)',
+              overflow: 'hidden', maxHeight: '72vh',
             }}>
               {/* Left: poster preview */}
               <div style={{
@@ -1036,7 +1050,7 @@ export default function Delivery({
                 <div style={{ fontSize: 9, color: 'var(--text-l)', marginTop: 6 }}>点击放大查看</div>
               </div>
               {/* Right: adjustment panel */}
-              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto' }}>
+              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto', minHeight: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 700 }}>海报调整</div>
                 <div style={{ fontSize: 11, color: 'var(--text-m)', lineHeight: 1.6 }}>
                   如需修改海报内容，可选择调整方向后重新生成。
@@ -1099,6 +1113,10 @@ export default function Delivery({
             boxShadow: 'var(--shadow)',
             borderTop: '2px solid var(--sage)',
             padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+            height: '100%',
           }}
         >
           <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12 }}>导出与分享</div>
@@ -1132,6 +1150,7 @@ export default function Delivery({
             </div>
           ))}
 
+          <div style={{ flex: 1 }} />
           {/* Compact stats row */}
           <div style={{ margin: '14px 0 8px', fontSize: 10, color: 'var(--text-l)' }}>本次生成统计</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 12 }}>
