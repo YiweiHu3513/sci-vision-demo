@@ -448,13 +448,16 @@ function SlideCarousel({ compact = false }) {
   );
 }
 
-function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl, pptFilename }) {
+function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl, pptFilename, fillHeight = false }) {
   const marked = markedSlides.size;
   return (
     <div style={{
       borderRadius: 16, border: '1px solid var(--border)',
       background: 'var(--card)', boxShadow: 'var(--shadow)',
       display: 'flex', flexDirection: 'column',
+      flex: fillHeight ? 1 : '0 0 auto',
+      minHeight: fillHeight ? 0 : 'auto',
+      height: fillHeight ? '100%' : 'auto',
     }}>
       {/* Header */}
       <div style={{
@@ -756,7 +759,7 @@ export default function Delivery({
         alignItems: 'stretch',
         minHeight: 'calc(100vh - 190px)',
       }}>
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: 0, height: '100%' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -987,21 +990,24 @@ export default function Delivery({
           )}
 
           {showPpt && activeMedia === 'ppt' && (
-            <PptGridView
-              slides={slides}
-              markedSlides={markedSlides}
-              onToggleMark={(i) => setMarkedSlides(prev => {
-                const next = new Set(prev);
-                if (next.has(i)) next.delete(i); else next.add(i);
-                return next;
-              })}
-              onRegenMarked={() => {
-                setRegenToast(true);
-                setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000);
-              }}
-              pptUrl={DEMO_ASSETS.ppt.url}
-              pptFilename={DEMO_ASSETS.ppt.filename}
-            />
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              <PptGridView
+                slides={slides}
+                markedSlides={markedSlides}
+                onToggleMark={(i) => setMarkedSlides(prev => {
+                  const next = new Set(prev);
+                  if (next.has(i)) next.delete(i); else next.add(i);
+                  return next;
+                })}
+                onRegenMarked={() => {
+                  setRegenToast(true);
+                  setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000);
+                }}
+                pptUrl={DEMO_ASSETS.ppt.url}
+                pptFilename={DEMO_ASSETS.ppt.filename}
+                fillHeight
+              />
+            </div>
           )}
           {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
           {activeMedia === 'all' && (
