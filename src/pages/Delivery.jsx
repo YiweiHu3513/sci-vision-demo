@@ -351,9 +351,11 @@ function SlideCarousel({ compact = false }) {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        minWidth: 0,
         minHeight: 0,
         marginTop: compact ? 0 : 14,
         height: compact ? '100%' : 'auto',
+        overflow: 'hidden',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -376,6 +378,7 @@ function SlideCarousel({ compact = false }) {
         <div
           className="slide-scrollbar"
           style={{
+            width: '100%',
             height: '100%',
             display: 'flex',
             gap: 12,
@@ -1011,7 +1014,18 @@ export default function Delivery({
           )}
           {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
           {activeMedia === 'all' && (
-            <div style={{ display: 'flex', gap: 14, marginTop: 12, minHeight: 0, alignItems: 'stretch' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '180px minmax(0, 1fr)',
+                gap: 14,
+                marginTop: 12,
+                minHeight: 0,
+                alignItems: 'stretch',
+                width: '100%',
+                overflow: 'hidden',
+              }}
+            >
               {/* Poster thumbnail */}
               <div
                 onClick={() => setShowPosterPreview(true)}
@@ -1033,7 +1047,7 @@ export default function Delivery({
                 </div>
               </div>
               {/* PPT carousel */}
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', minHeight: 0 }}>
+              <div style={{ minWidth: 0, display: 'flex', minHeight: 0, overflow: 'hidden' }}>
                 <SlideCarousel compact />
               </div>
             </div>
