@@ -346,7 +346,16 @@ function PosterPreviewModal({ url, onClose }) {
 
 function SlideCarousel({ compact = false }) {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, marginTop: compact ? 0 : 14 }}>
+    <div
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: 0,
+        marginTop: compact ? 0 : 14,
+        height: compact ? '100%' : 'auto',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ fontSize: 13, fontWeight: 700 }}>PPT 滚动预览</div>
         <div style={{ fontSize: 10, color: 'var(--text-l)' }}>{slides.length} 张</div>
@@ -1018,7 +1027,7 @@ export default function Delivery({
                 </div>
               </div>
               {/* PPT carousel */}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', minHeight: 0 }}>
                 <SlideCarousel compact />
               </div>
             </div>
