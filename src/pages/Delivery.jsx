@@ -4,21 +4,23 @@ import StepBar from '../components/StepBar';
 import { DEMO_ASSETS } from '../config/demoAssets';
 
 const slides = [
-  { title: '引言背景', color: 'var(--sage)' },
-  { title: '研究方法', color: 'var(--dust)' },
-  { title: '实验设计', color: 'var(--taupe)' },
-  { title: '结果分析', color: 'var(--lav)' },
-  { title: '结论展望', color: '#ACA08A' },
-  { title: '数据可视化', color: 'var(--sage)' },
-  { title: '模型架构', color: 'var(--dust)' },
-  { title: '对比实验', color: 'var(--taupe)' },
-  { title: '消融分析', color: 'var(--lav)' },
-  { title: '未来工作', color: '#ACA08A' },
+  { title: '第 1 页', color: 'var(--sage)' },
+  { title: '第 2 页', color: 'var(--dust)' },
+  { title: '第 3 页', color: 'var(--taupe)' },
+  { title: '第 4 页', color: 'var(--lav)' },
+  { title: '第 5 页', color: '#ACA08A' },
+  { title: '第 6 页', color: 'var(--sage)' },
+  { title: '第 7 页', color: 'var(--dust)' },
+  { title: '第 8 页', color: 'var(--taupe)' },
+  { title: '第 9 页', color: 'var(--lav)' },
+  { title: '第 10 页', color: '#ACA08A' },
+  { title: '第 11 页', color: 'var(--sage)' },
+  { title: '第 12 页', color: 'var(--dust)' },
 ];
 
 const stats = [
   ['处理时长', '18.3 秒'],
-  ['生成图片', '10 张'],
+  ['生成图片', '12 张'],
   ['脚本段落', '10 段'],
   ['视频时长', '2:00'],
 ];

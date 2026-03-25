@@ -13,8 +13,8 @@ export const DEMO_ASSETS = {
   ppt: {
     url: resolveAssetUrl('/demo-samples/llm-agents-deck.pptx', import.meta.env.VITE_DEMO_PPT_URL),
     filename: 'The Rise and Potential of Large Language Model Based Agents【PPt】..pptx',
-    size: '12MB',
-    meta: 'PPTX · 演示文稿',
+    size: '66MB',
+    meta: 'PPTX · 12页演示文稿',
   },
   poster: {
     url: resolveAssetUrl('/demo-samples/llm-agents-poster.png', import.meta.env.VITE_DEMO_POSTER_URL),
