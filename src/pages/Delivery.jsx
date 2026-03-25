@@ -30,6 +30,33 @@ const resolutions = [
   { label: '4K', desc: '超清', credits: 80, size: '520MB' },
 ];
 
+const POSTER_LAYOUTS = [
+  {
+    key: 'a3_landscape',
+    label: 'A3 横版',
+    url: DEMO_ASSETS.poster.url,
+    filename: 'A3横版海报.png',
+    size: '5.8MB',
+    meta: 'PNG · A3 横版',
+  },
+  {
+    key: 'a3_portrait',
+    label: 'A3 竖版',
+    url: '/demo-samples/llm-agents-poster-a3-portrait.png',
+    filename: 'A3竖版海报.png',
+    size: '6.1MB',
+    meta: 'PNG · A3 竖版',
+  },
+  {
+    key: 'square',
+    label: '方形 1:1',
+    url: '/demo-samples/llm-agents-poster-square.png',
+    filename: '1_1方形海报.png',
+    size: '5.8MB',
+    meta: 'PNG · 1:1 方形',
+  },
+];
+
 function formatTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return '00:00';
   const s = Math.floor(seconds % 60);
@@ -608,6 +635,7 @@ export default function Delivery({
   const [speed, setSpeed] = useState('1x');
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showPosterPreview, setShowPosterPreview] = useState(false);
+  const [posterLayout, setPosterLayout] = useState('a3_landscape');
   const [markedSlides, setMarkedSlides] = useState(new Set());
   const [regenToast, setRegenToast] = useState(false);
 
@@ -704,6 +732,7 @@ export default function Delivery({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const speeds = ['0.5x', '0.75x', '1x', '1.25x', '1.5x', '2x'];
+  const activePoster = POSTER_LAYOUTS.find((item) => item.key === posterLayout) ?? POSTER_LAYOUTS[0];
 
   const dynamicExport = [
     {
@@ -727,11 +756,11 @@ export default function Delivery({
     {
       key: 'poster',
       icon: '◈',
-      label: '下载宣传海报',
-      sub: `${DEMO_ASSETS.poster.meta} · ${DEMO_ASSETS.poster.size}`,
+      label: `下载宣传海报（${activePoster.label}）`,
+      sub: `${activePoster.meta} · ${activePoster.size}`,
       color: '#ACA08A',
-      href: DEMO_ASSETS.poster.url,
-      download: DEMO_ASSETS.poster.filename,
+      href: activePoster.url,
+      download: activePoster.filename,
     },
     { key: 'pdf', icon: '≡', label: '下载分镜脚本 PDF', sub: '暂未上传样本', color: 'var(--taupe)' },
     { key: 'share', icon: '⬡', label: '生成分享链接', sub: '暂未启用', color: 'var(--lav)' },
@@ -1042,7 +1071,7 @@ export default function Delivery({
                 onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
                 onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
               >
-                <img src={DEMO_ASSETS.poster.url} alt="海报" style={{
+                <img src={activePoster.url} alt={`海报（${activePoster.label}）`} style={{
                   width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
                 }}/>
                 <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
@@ -1075,7 +1104,7 @@ export default function Delivery({
                 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8, alignSelf: 'flex-start' }}>海报预览</div>
                 <img
-                  src={DEMO_ASSETS.poster.url} alt="海报"
+                  src={activePoster.url} alt={`海报（${activePoster.label}）`}
                   onClick={() => setShowPosterPreview(true)}
                   style={{
                     width: '100%', flex: 1, minHeight: 0,
@@ -1120,15 +1149,24 @@ export default function Delivery({
                 <div>
                   <div style={{ fontSize: 10, color: 'var(--text-l)', marginBottom: 4 }}>版面方向</div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    {['A3 竖版（当前）', 'A3 横版', '方形 1:1'].map((opt, i) => (
-                      <button key={opt} style={{
-                        flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 10, fontWeight: 600,
-                        border: i === 0 ? '1.5px solid var(--sage)' : '1px solid var(--border)',
-                        background: i === 0 ? 'rgba(100,140,108,0.06)' : 'var(--bg)',
-                        color: i === 0 ? 'var(--sage)' : 'var(--text-m)',
-                        fontFamily: 'inherit', cursor: 'pointer',
-                      }}>{opt}</button>
-                    ))}
+                    {POSTER_LAYOUTS.map((layout) => {
+                      const active = layout.key === activePoster.key;
+                      return (
+                        <button
+                          key={layout.key}
+                          onClick={() => setPosterLayout(layout.key)}
+                          style={{
+                            flex: 1, padding: '7px 4px', borderRadius: 8, fontSize: 10, fontWeight: 600,
+                            border: active ? '1.5px solid var(--sage)' : '1px solid var(--border)',
+                            background: active ? 'rgba(100,140,108,0.06)' : 'var(--bg)',
+                            color: active ? 'var(--sage)' : 'var(--text-m)',
+                            fontFamily: 'inherit', cursor: 'pointer',
+                          }}
+                        >
+                          {layout.label}{active ? '（当前）' : ''}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
                 <button style={{
@@ -1227,7 +1265,7 @@ export default function Delivery({
           onCancel={() => setPendingRes(null)}
         />
       )}
-      {showPosterPreview && <PosterPreviewModal url={DEMO_ASSETS.poster.url} onClose={() => setShowPosterPreview(false)} />}
+      {showPosterPreview && <PosterPreviewModal url={activePoster.url} onClose={() => setShowPosterPreview(false)} />}
 
       {upgrading && (
         <div

@@ -28,5 +28,7 @@ public/demo-samples/*
 !public/demo-samples/llm-agents-video-demo.mp4
 !public/demo-samples/llm-agents-deck.pptx
 !public/demo-samples/llm-agents-poster.png
+!public/demo-samples/llm-agents-poster-a3-portrait.png
+!public/demo-samples/llm-agents-poster-square.png
 !public/demo-samples/ppt-thumbs/
 !public/demo-samples/ppt-thumbs/*.png
