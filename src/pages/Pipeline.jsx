@@ -149,7 +149,6 @@ export default function Pipeline({ onNext, onCancel, user, onOpenAuth, onLogout,
             <p style={{ fontSize:13, color:'var(--text-l)', marginTop:2 }}>流水线处理中，完成后自动跳转</p>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <span style={{ fontSize:13, color:'var(--sage)', fontWeight:700 }}>{Math.round(progress)}%</span>
             <button onClick={() => { clearInterval(timer.current); onCancel?.(); }}
               style={{
                 border:'1.5px solid #C45C5C', background:'rgba(196,92,92,0.06)',
@@ -160,6 +159,7 @@ export default function Pipeline({ onNext, onCancel, user, onOpenAuth, onLogout,
               onMouseEnter={e => { e.currentTarget.style.background='#C45C5C'; e.currentTarget.style.color='#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.background='rgba(196,92,92,0.06)'; e.currentTarget.style.color='#C45C5C'; }}
             >✕ 取消生成</button>
+            <span style={{ fontSize:13, color:'var(--sage)', fontWeight:700 }}>{Math.round(progress)}%</span>
           </div>
         </div>
         <div style={{ height:6, background:'var(--bg2)', borderRadius:3, marginBottom:20 }}>
