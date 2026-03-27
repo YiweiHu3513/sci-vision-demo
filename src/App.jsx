@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import Upload from './pages/Upload';
+import ModeSelect from './pages/ModeSelect';
+import AgentChat from './pages/AgentChat';
 import Analysis from './pages/Analysis';
 import MaterialSelect from './pages/MaterialSelect';
 import Config from './pages/Config';
@@ -60,18 +62,29 @@ const DEMO_PROJECTS = [
 ];
 
 /*
- * Step mapping (7 steps):
- *   0 = Upload
- *   1 = Analysis
- *   2 = MaterialSelect  ← NEW
- *   3 = Config
- *   4 = Pipeline (video generation, skipped if no video)
- *   5 = CreativeStudio (poster + PPT)
- *   6 = Delivery
+ * Views & Steps:
+ *
+ *   view='workflow':
+ *     0 = Upload
+ *     1 = ModeSelect (choose Agent or Manual)
+ *
+ *   view='agent':
+ *     AgentChat (full-screen chat, skips all manual steps)
+ *
+ *   view='workflow' (manual path):
+ *     2 = Analysis
+ *     3 = MaterialSelect
+ *     4 = Config
+ *     5 = Pipeline (skipped if no video)
+ *     6 = CreativeStudio
+ *     7 = Delivery
+ *
+ *   view='library':
+ *     Library page
  */
 
 export default function App() {
-  const [view, setView] = useState('workflow'); // 'workflow' | 'library'
+  const [view, setView] = useState('workflow'); // 'workflow' | 'agent' | 'library'
   const [step, setStep] = useState(0);
   const [animIn, setAnimIn] = useState(true);
   const [user, setUser] = useState(null);
@@ -91,13 +104,13 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const goTo = (newStep) => {
+  const goTo = (newStep, newView = 'workflow') => {
     if (busyRef.current) return;
     busyRef.current = true;
     setAnimIn(false);
     setTimeout(() => {
       setStep(newStep);
-      setView('workflow');
+      setView(newView);
       setAnimIn(true);
       setTimeout(() => { busyRef.current = false; }, 700);
     }, 400);
@@ -126,16 +139,7 @@ export default function App() {
     const proj = projects.find(p => p.id === id);
     if (proj) {
       setCurrentProjectName(proj.name);
-      setStep(6); // Go to Delivery
-      setView('workflow');
-      if (!busyRef.current) {
-        busyRef.current = true;
-        setAnimIn(false);
-        setTimeout(() => {
-          setAnimIn(true);
-          setTimeout(() => { busyRef.current = false; }, 700);
-        }, 400);
-      }
+      goTo(7); // Go to Delivery
     }
   };
 
@@ -146,17 +150,41 @@ export default function App() {
     setTimeout(() => setStep(0), 50);
   };
 
-  // When moving from Analysis to MaterialSelect, set project name from paper title
-  const handleAnalysisNext = () => {
+  // Upload → ModeSelect
+  const handleUploadNext = () => {
     if (!currentProjectName) {
       setCurrentProjectName('Efficient Neural Network Pruning via Gradient-Based Structural Optimization');
     }
-    goTo(2); // → MaterialSelect
+    goTo(1);
   };
 
-  // Config → Pipeline or CreativeStudio depending on video selection
+  // ModeSelect → Agent or Manual
+  const handleSelectAgent = () => {
+    goTo(0, 'agent');
+  };
+  const handleSelectManual = () => {
+    goTo(2); // → Analysis
+  };
+
+  // Agent → Delivery (with all outputs selected)
+  const handleAgentToDelivery = () => {
+    setSelectedOutputs({ video: true, poster: true, ppt: true });
+    goTo(7);
+  };
+
+  // Agent → switch to Manual (goes to Analysis)
+  const handleAgentToManual = () => {
+    goTo(2);
+  };
+
+  // Analysis → MaterialSelect
+  const handleAnalysisNext = () => {
+    goTo(3);
+  };
+
+  // Config → Pipeline or CreativeStudio
   const handleConfigNext = () => {
-    goTo(selectedOutputs.video ? 4 : 5);
+    goTo(selectedOutputs.video ? 5 : 6);
   };
 
   const authProps = {
@@ -168,7 +196,7 @@ export default function App() {
   const navProps = {
     ...authProps,
     onNavLibrary: () => switchView('library'),
-    projectName: view === 'workflow' && step > 0 ? currentProjectName : undefined,
+    projectName: (view === 'workflow' && step > 0) || view === 'agent' ? currentProjectName : undefined,
     onProjectNameChange: (name) => setCurrentProjectName(name),
   };
 
@@ -190,15 +218,25 @@ export default function App() {
             {...authProps}
           />
         )}
+
+        {view === 'agent' && (
+          <AgentChat
+            onGoToDelivery={handleAgentToDelivery}
+            onSwitchToManual={handleAgentToManual}
+            {...navProps}
+          />
+        )}
+
         {view === 'workflow' && (
           <>
-            {step === 0 && <Upload   onNext={() => goTo(1)} {...navProps} />}
-            {step === 1 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
-            {step === 2 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 3 : 5)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 3 && <Config   onNext={handleConfigNext} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 4 && <Pipeline onNext={() => goTo(5)} {...navProps} />}
-            {step === 5 && <CreativeStudio onNext={() => goTo(6)} selectedOutputs={selectedOutputs} {...navProps} />}
-            {step === 6 && <Delivery onReset={handleNewProject} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 0 && <Upload   onNext={handleUploadNext} {...navProps} />}
+            {step === 1 && <ModeSelect onSelectAgent={handleSelectAgent} onSelectManual={handleSelectManual} {...navProps} />}
+            {step === 2 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
+            {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 4 && <Config   onNext={handleConfigNext} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 5 && <Pipeline onNext={() => goTo(6)} {...navProps} />}
+            {step === 6 && <CreativeStudio onNext={() => goTo(7)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 7 && <Delivery onReset={handleNewProject} selectedOutputs={selectedOutputs} {...navProps} />}
           </>
         )}
       </div>
