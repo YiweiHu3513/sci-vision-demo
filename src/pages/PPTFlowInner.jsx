@@ -10,9 +10,9 @@ const SUB_STEPS = ['场景选择', '配置', '生成中', '预览与下载'];
 const SCENES = [
   { id: 'popular_science', icon: '🎬', title: '科普演讲', desc: '全屏视觉冲击，TED/Keynote 风格', detail: '全屏背景图+大字标题 · 每页 1-2 要点 · 暗色/渐变', available: true },
   { id: 'lab_report', icon: '🔬', title: '课题汇报', desc: '信息密集，图表为主，支持校模板', detail: '数据+图表+要点 · 论文原图 · 亮色/白底', available: true },
-  { id: 'conference', icon: '📊', title: '学术会议', desc: '严肃规范，大量引用，学术风', detail: '方法+结果+引用 · 论文原图+流程图 · 白底/浅色', available: false },
-  { id: 'thesis_defense', icon: '🎓', title: '毕业答辩', desc: '清晰条理，逻辑清晰，平衡美观', detail: 'AI 概念图+论文原图混合 · 学校色系', available: false },
-  { id: 'business_pitch', icon: '💼', title: '企业路演', desc: '数据亮点突出，高端质感，商业叙事', detail: 'AI 概念图+数据可视化 · 暗色/渐变', available: false },
+  { id: 'conference', icon: '📊', title: '学术会议', desc: '严肃规范，大量引用，学术风', detail: '方法+结果+引用 · 论文原图+流程图 · 白底/浅色', available: true },
+  { id: 'thesis_defense', icon: '🎓', title: '毕业答辩', desc: '清晰条理，逻辑清晰，平衡美观', detail: 'AI 概念图+论文原图混合 · 学校色系', available: true },
+  { id: 'business_pitch', icon: '💼', title: '企业路演', desc: '数据亮点突出，高端质感，商业叙事', detail: 'AI 概念图+数据可视化 · 暗色/渐变', available: true },
 ];
 
 const GEN_STAGES = [
