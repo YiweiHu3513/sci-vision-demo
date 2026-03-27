@@ -116,6 +116,12 @@ export default function App() {
     }, 400);
   };
 
+  const goToFromUserAction = (newStep, newView = 'workflow') => {
+    // Back/cancel actions should always respond immediately, even during transition lock.
+    busyRef.current = false;
+    goTo(newStep, newView);
+  };
+
   const switchView = (newView) => {
     if (busyRef.current) return;
     busyRef.current = true;
@@ -196,7 +202,7 @@ export default function App() {
 
   // Pipeline cancel → back to Config
   const handlePipelineCancel = () => {
-    goTo(4);
+    goToFromUserAction(4);
   };
 
   // StepBar click → map stepbar index to internal step number
@@ -256,13 +262,13 @@ export default function App() {
         {view === 'workflow' && (
           <>
             {step === 0 && <Upload   onNext={handleUploadNext} {...navProps} />}
-            {step === 1 && <ModeSelect onSelectAgent={handleSelectAgent} onSelectManual={handleSelectManual} onBack={() => goTo(0)} {...navProps} />}
-            {step === 2 && <Analysis onNext={handleAnalysisNext} onBack={() => goTo(1)} {...navProps} />}
-            {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} onBack={() => goTo(2)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 4 && <Config   onNext={handleConfigNext} onBack={() => goTo(3)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 1 && <ModeSelect onSelectAgent={handleSelectAgent} onSelectManual={handleSelectManual} onBack={() => goToFromUserAction(0)} {...navProps} />}
+            {step === 2 && <Analysis onNext={handleAnalysisNext} onBack={() => goToFromUserAction(1)} {...navProps} />}
+            {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} onBack={() => goToFromUserAction(2)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 4 && <Config   onNext={handleConfigNext} onBack={() => goToFromUserAction(3)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
             {step === 5 && <Pipeline {...navProps} onNext={() => goTo(6)} onCancel={handlePipelineCancel} />}
-            {step === 6 && <CreativeStudio onNext={() => goTo(7)} onBack={() => goTo(selectedOutputs.video ? 5 : 4)} selectedOutputs={selectedOutputs} {...navProps} />}
-            {step === 7 && <Delivery onReset={handleNewProject} onBack={() => goTo(6)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 6 && <CreativeStudio onNext={() => goTo(7)} onBack={() => goToFromUserAction(selectedOutputs.video ? 5 : 4)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 7 && <Delivery onReset={handleNewProject} onBack={() => goToFromUserAction(6)} selectedOutputs={selectedOutputs} {...navProps} />}
           </>
         )}
       </div>
