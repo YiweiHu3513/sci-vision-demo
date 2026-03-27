@@ -87,8 +87,53 @@ const POSTER_LAYOUTS = [
   { key: 'square', label: '方形 1:1', ratio: '1/1', size: '5.8MB', meta: 'PNG · 1:1 方形' },
 ];
 
+const JOURNAL_POLICY_COPY = Object.freeze({
+  nature: '⚠️ Nature 及其子刊封面指南明确：不允许使用生成式 AI（如 DALL·E、Stable Diffusion、Midjourney）创建的图像用于正式封面投稿。本平台生成的封面仅用于科研宣传、社交媒体分享和演示用途。',
+  cell: '⚠️ Cell 封面提交指南明确：由生成式 AI 工具创建的图像 cannot be accepted（不予接收）。如不确定是否适用，请先联系期刊编辑确认。本平台生成的封面建议用于科研宣传和演示。',
+  science: '⚠️ Science 系列编辑政策显示：AI 生成图像与多媒体在未获编辑明确许可前不被允许，特定情形可酌情例外。本平台生成的封面仅用于科研宣传、社交媒体分享和演示用途。',
+  fallback: '生成的封面设计适用于论文宣传、学术海报、PPT 演示和社交媒体分享。如需用于正式投稿，请以目标期刊最新官方图像政策为准，并在投稿前向编辑部确认。',
+});
+
+const JOURNAL_POLICY_ROWS = [
+  { label: 'Nature 系列', text: JOURNAL_POLICY_COPY.nature },
+  { label: 'Cell 系列', text: JOURNAL_POLICY_COPY.cell },
+  { label: 'Science 系列', text: JOURNAL_POLICY_COPY.science },
+  { label: '通用兜底（所有期刊）', text: JOURNAL_POLICY_COPY.fallback },
+];
+
 const STRATEGY_COLORS = { '写实': '#50A864', '隐喻': '#8A7CA0', '混合': '#6482A0' };
 const SUB_STEPS = ['风格选择', '期刊选择', '创意方案', '预览与下载'];
+
+function resolveJournalPolicy(journal) {
+  const normalized = String(journal || '').trim().toLowerCase();
+  if (!normalized) return JOURNAL_POLICY_COPY.fallback;
+  if (normalized.startsWith('nature') || normalized.includes('nature') || normalized.startsWith('nat.')) {
+    return JOURNAL_POLICY_COPY.nature;
+  }
+  if (normalized.includes('cell')) return JOURNAL_POLICY_COPY.cell;
+  if (normalized.startsWith('science') || normalized.includes('science') || normalized.startsWith('sci.')) {
+    return JOURNAL_POLICY_COPY.science;
+  }
+  return JOURNAL_POLICY_COPY.fallback;
+}
+
+function JournalPolicyNotice({ journal }) {
+  return (
+    <div
+      style={{
+        borderRadius: 10,
+        padding: '10px 12px',
+        background: 'rgba(172,128,74,0.08)',
+        border: '1px solid rgba(172,128,74,0.22)',
+        fontSize: 11,
+        color: 'var(--amber)',
+        lineHeight: 1.65,
+      }}
+    >
+      {resolveJournalPolicy(journal)}
+    </div>
+  );
+}
 
 function ScoreBar({ label, value, max = 10 }) {
   const pct = (value / max) * 100;
@@ -184,6 +229,16 @@ function JournalSelect({ onSelect, onBack }) {
           <p style={{ fontSize: 12, color: 'var(--text-l)', marginTop: 2 }}>排版将遵循所选期刊的封面模板风格</p>
         </div>
       </div>
+      <div style={{ marginBottom: 18, borderRadius: 12, border: '1px solid rgba(172,128,74,0.22)', background: 'rgba(172,128,74,0.06)', padding: '10px 12px' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--amber)', marginBottom: 6 }}>期刊政策提示</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {JOURNAL_POLICY_ROWS.map((row) => (
+            <div key={row.label} style={{ fontSize: 11, color: 'var(--amber)', lineHeight: 1.6 }}>
+              <b>{row.label}：</b>{row.text}
+            </div>
+          ))}
+        </div>
+      </div>
       {JOURNAL_GROUPS.map((group) => (
         <div key={group.group} style={{ marginBottom: 20 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-l)', marginBottom: 8, letterSpacing: 0.5 }}>{group.group}</div>
@@ -262,6 +317,9 @@ function ProposalSelect({ journal, onSelect, onBack }) {
           <h2 style={{ fontSize: 18, fontWeight: 700 }}>AI 为您生成了 5 个封面创意方向</h2>
           <p style={{ fontSize: 12, color: 'var(--text-l)', marginTop: 2 }}>期刊：{journalLabel} · 选择一个方案进行生成</p>
         </div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <JournalPolicyNotice journal={journal} />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {proposals.map((p, idx) => {
@@ -406,6 +464,8 @@ function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneratio
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-m)' }}>{journalLabel} · {proposal.score} 分</div>
           </div>
+
+          <JournalPolicyNotice journal={journal} />
 
           {qualityWarning && (
             <div style={{ borderRadius: 10, padding: '8px 12px', background: 'rgba(172,128,74,0.08)', border: '1px solid rgba(172,128,74,0.2)', fontSize: 11, color: 'var(--amber)', lineHeight: 1.5 }}>
