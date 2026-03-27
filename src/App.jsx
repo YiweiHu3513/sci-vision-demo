@@ -99,7 +99,6 @@ export default function App() {
   const [selectedOutputs, setSelectedOutputs] = useState({ video: true, poster: true, ppt: true });
   const [userCredits, setUserCredits] = useState(150);
   const [stepBarMaxReached, setStepBarMaxReached] = useState(0);
-  const [hasDeliveryCompleted, setHasDeliveryCompleted] = useState(false);
   const busyRef = useRef(false);
 
   useEffect(() => {
@@ -122,7 +121,6 @@ export default function App() {
     setTimeout(() => {
       if (newView === 'workflow') {
         setStepBarMaxReached((prev) => Math.max(prev, internalStepToStepBarIndex(newStep)));
-        if (newStep === 7) setHasDeliveryCompleted(true);
       }
       setStep(newStep);
       setView(newView);
@@ -174,7 +172,6 @@ export default function App() {
       setStep(0);
       setView('workflow');
       setStepBarMaxReached(0);
-      setHasDeliveryCompleted(false);
       setAnimIn(true);
       setTimeout(() => { busyRef.current = false; }, 700);
     }, 300);
@@ -225,7 +222,12 @@ export default function App() {
   const canGoToStepBarIndex = (targetIndex, currentIndex = activeStepBarIndex) => {
     if (view !== 'workflow') return false;
     if (targetIndex === 4) return false; // "生成中" should never be manually entered
-    if (hasDeliveryCompleted) return POST_DELIVERY_ALLOWED_STEP_BAR.has(targetIndex) && targetIndex !== currentIndex; // only creative<->delivery loop
+
+    // Once entering CreativeStudio/Delivery (step bar 6/7), lock navigation to 6 <-> 7.
+    if (currentIndex >= 5) {
+      return POST_DELIVERY_ALLOWED_STEP_BAR.has(targetIndex) && targetIndex !== currentIndex;
+    }
+
     return targetIndex < currentIndex && targetIndex <= stepBarMaxReached;
   };
 
