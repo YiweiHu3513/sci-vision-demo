@@ -102,13 +102,58 @@ function SceneSelect({ onSelect }) {
   );
 }
 
+// Page presets per scene
+const SCENE_PAGE_CONFIG = {
+  popular_science:  { presets: [6, 8, 10], default: 6, aiSuggest: false, showDuration: true },
+  lab_report:       { presets: null, default: 12, aiSuggest: true, showDuration: false },
+  conference:       { presets: null, default: 10, aiSuggest: true, showDuration: false },
+  thesis_defense:   { presets: [8, 10, 12, 15], default: 12, aiSuggest: false, showDuration: true },
+  business_pitch:   { presets: [6, 8, 10], default: 8, aiSuggest: false, showDuration: true },
+};
+
+// Duration → recommended pages
+function durationToPages(minutes) {
+  if (minutes <= 5) return { min: 5, max: 6, rec: 6 };
+  if (minutes <= 10) return { min: 8, max: 10, rec: 8 };
+  if (minutes <= 15) return { min: 10, max: 12, rec: 12 };
+  if (minutes <= 20) return { min: 12, max: 15, rec: 14 };
+  return { min: 15, max: 20, rec: 18 };
+}
+
 /* ── Step 2: 配置 ── */
 function PPTConfig({ scene, onSubmit, onBack }) {
-  const [pages, setPages] = useState(scene === 'popular_science' ? 6 : 10);
+  const cfg = SCENE_PAGE_CONFIG[scene] || SCENE_PAGE_CONFIG.popular_science;
+  const [pages, setPages] = useState(cfg.default);
+  const [customPages, setCustomPages] = useState('');
+  const [isCustom, setIsCustom] = useState(false);
+  const [duration, setDuration] = useState('');
+  const [durationHint, setDurationHint] = useState(null);
   const [language, setLanguage] = useState('en');
   const [ratio, setRatio] = useState('16:9');
   const isLabReport = scene === 'lab_report';
   const sceneLabel = SCENES.find(s => s.id === scene)?.title || scene;
+
+  const handlePreset = (n) => { setPages(n); setIsCustom(false); setCustomPages(''); };
+  const handleCustomInput = (v) => {
+    setCustomPages(v);
+    const num = parseInt(v);
+    if (num >= 3 && num <= 30) { setPages(num); setIsCustom(true); }
+  };
+  const handleDuration = (v) => {
+    setDuration(v);
+    const min = parseInt(v);
+    if (min >= 1 && min <= 60) {
+      const rec = durationToPages(min);
+      setDurationHint(rec);
+      setPages(rec.rec);
+      setIsCustom(false);
+      setCustomPages('');
+    } else {
+      setDurationHint(null);
+    }
+  };
+
+  const effectivePages = isCustom ? (parseInt(customPages) || cfg.default) : pages;
 
   return (
     <div style={{ maxWidth: 560, margin: '0 auto', padding: '20px 24px' }}>
@@ -120,17 +165,77 @@ function PPTConfig({ scene, onSubmit, onBack }) {
         </div>
       </div>
       <div style={{ borderRadius: 14, border: '1px solid var(--border)', background: 'var(--card)', boxShadow: 'var(--shadow)', padding: '20px' }}>
+
+        {/* Duration input (for presentation scenes) */}
+        {cfg.showDuration && (
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-m)', marginBottom: 8 }}>⏱ 演讲时长（可选，输入后自动推荐页数）</div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                value={duration} onChange={(e) => handleDuration(e.target.value)}
+                placeholder="例如：15" type="number" min="1" max="60"
+                style={{ flex: 1, padding: '10px 12px', borderRadius: 8, border: '1.5px solid var(--border)', background: 'var(--bg)', fontSize: 13, fontFamily: 'inherit', color: 'var(--text-d)', outline: 'none', textAlign: 'center' }}
+                onFocus={e => e.target.style.borderColor = 'var(--dust)'}
+                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+              />
+              <span style={{ fontSize: 12, color: 'var(--text-l)', flexShrink: 0 }}>分钟</span>
+            </div>
+            {durationHint && (
+              <div style={{ marginTop: 6, padding: '6px 10px', borderRadius: 8, background: 'var(--dust-bg)', border: '1px solid var(--dust)', fontSize: 11, color: 'var(--dust)', fontWeight: 600 }}>
+                ✦ {duration} 分钟演讲，建议 {durationHint.min}-{durationHint.max} 页，已自动设为 {durationHint.rec} 页
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Pages */}
         <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-m)', marginBottom: 8 }}>页数</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-m)', marginBottom: 8 }}>
+            页数
+            {cfg.aiSuggest && <span style={{ fontSize: 9, color: 'var(--dust)', marginLeft: 6, fontWeight: 600 }}>✦ AI 根据论文内容推荐</span>}
+          </div>
+
+          {/* AI suggestion banner (for lab_report / conference) */}
+          {cfg.aiSuggest && (
+            <div style={{ marginBottom: 8, padding: '8px 12px', borderRadius: 8, background: 'var(--dust-bg)', border: '1px solid var(--dust)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 12, color: 'var(--dust)', fontWeight: 700 }}>AI 建议 {cfg.default} 页</span>
+              <span style={{ fontSize: 10, color: 'var(--text-l)' }}>基于论文内容量分析</span>
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: 8 }}>
-            {[6, 8, 10, 12].map(n => (
-              <button key={n} onClick={() => setPages(n)}
-                style={{ flex: 1, padding: '10px 4px', borderRadius: 8, border: pages === n ? '1.5px solid var(--dust)' : '1px solid var(--border)', background: pages === n ? 'var(--dust-bg)' : 'var(--bg)', color: pages === n ? 'var(--dust)' : 'var(--text-m)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+            {/* Preset buttons */}
+            {cfg.presets && cfg.presets.map(n => (
+              <button key={n} onClick={() => handlePreset(n)}
+                style={{ flex: 1, padding: '10px 4px', borderRadius: 8, border: !isCustom && pages === n ? '1.5px solid var(--dust)' : '1px solid var(--border)', background: !isCustom && pages === n ? 'var(--dust-bg)' : 'var(--bg)', color: !isCustom && pages === n ? 'var(--dust)' : 'var(--text-m)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
               >{n} 页</button>
             ))}
+            {/* Custom input */}
+            <div style={{ flex: 1, position: 'relative' }}>
+              <input
+                value={customPages} onChange={(e) => handleCustomInput(e.target.value)}
+                placeholder={cfg.aiSuggest ? `${cfg.default}` : '自定义'}
+                type="number" min="3" max="30"
+                style={{
+                  width: '100%', padding: '10px 4px', borderRadius: 8, textAlign: 'center',
+                  border: isCustom ? '1.5px solid var(--dust)' : '1px solid var(--border)',
+                  background: isCustom ? 'var(--dust-bg)' : 'var(--bg)',
+                  color: isCustom ? 'var(--dust)' : 'var(--text-m)',
+                  fontSize: 13, fontWeight: 700, fontFamily: 'inherit', outline: 'none',
+                }}
+                onFocus={e => e.target.style.borderColor = 'var(--dust)'}
+                onBlur={e => { if (!isCustom) e.target.style.borderColor = 'var(--border)'; }}
+              />
+              {!isCustom && !customPages && (
+                <span style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', fontSize: 9, color: 'var(--text-l)', pointerEvents: 'none' }}>✏️</span>
+              )}
+            </div>
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--text-l)', marginTop: 6 }}>
+            当前：{effectivePages} 页 · 支持 3-30 页自定义
           </div>
         </div>
+
         {/* Language */}
         <div style={{ marginBottom: 18 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-m)', marginBottom: 8 }}>语言</div>
@@ -162,7 +267,7 @@ function PPTConfig({ scene, onSubmit, onBack }) {
           </div>
           {isLabReport && <div style={{ fontSize: 10, color: 'var(--text-l)', marginTop: 6, lineHeight: 1.5 }}>上传学校/机构的 PPT 模板，AI 会按照你的模板风格生成内容。</div>}
         </div>
-        <button onClick={() => onSubmit({ pages, language, ratio })}
+        <button onClick={() => onSubmit({ pages: effectivePages, language, ratio })}
           style={{ width: '100%', padding: '13px', borderRadius: 10, background: 'var(--dust)', border: 'none', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>开始生成</button>
       </div>
     </div>
