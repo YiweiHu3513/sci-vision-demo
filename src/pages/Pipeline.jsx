@@ -143,18 +143,18 @@ export default function Pipeline({ onNext, onCancel, user, onOpenAuth, onLogout,
       <StepBar active={4} onGoToStep={onGoToStep} />
 
       <div style={{ padding:'12px 24px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:6 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap', marginBottom:6 }}>
           <div>
             <h2 style={{ fontSize:18, fontWeight:700 }}>AI 正在生成...</h2>
             <p style={{ fontSize:13, color:'var(--text-l)', marginTop:2 }}>流水线处理中，完成后自动跳转</p>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:12, marginLeft:'auto', flexShrink:0 }}>
             <button onClick={() => { clearInterval(timer.current); onCancel?.(); }}
               style={{
                 border:'1.5px solid #C45C5C', background:'rgba(196,92,92,0.06)',
                 borderRadius:8, padding:'7px 18px', fontSize:12, fontWeight:700,
                 color:'#C45C5C', cursor:'pointer', fontFamily:'inherit',
-                transition:'all 0.15s',
+                transition:'all 0.15s', whiteSpace:'nowrap',
               }}
               onMouseEnter={e => { e.currentTarget.style.background='#C45C5C'; e.currentTarget.style.color='#fff'; }}
               onMouseLeave={e => { e.currentTarget.style.background='rgba(196,92,92,0.06)'; e.currentTarget.style.color='#C45C5C'; }}
