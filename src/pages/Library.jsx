@@ -18,7 +18,6 @@ const STATUS_MAP = {
 
 function ProjectCard({ project, onOpen, onRename }) {
   const st = STATUS_MAP[project.status] || STATUS_MAP.draft;
-  const assetCount = Object.values(project.assets).filter(Boolean).length;
 
   return (
     <div

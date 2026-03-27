@@ -77,14 +77,19 @@ const MAX_ASSET_SLOTS = 8;
 
 export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [progress, setProgress] = useState(0);
-  const [activeNode, setActiveNode] = useState(2); // C is active
-  const [doneNodes, setDoneNodes] = useState([0,1]); // A, B done
-  const [assetCount, setAssetCount] = useState(4);
-  const [visibleLines, setVisibleLines] = useState(0);
   const timer = useRef(null);
   const codeRef = useRef(null);
+  const onNextRef = useRef(onNext);
 
   const done = useRef(false);
+  const activeNode = progress > 90 ? 6 : progress > 80 ? 5 : progress > 70 ? 4 : progress > 55 ? 3 : 2;
+  const doneNodes = Array.from({ length: activeNode }, (_, idx) => idx);
+  const assetCount = progress > 50 ? Math.floor(progress / 10) : 4;
+  const visibleLines = Math.min(Math.floor((progress / 95) * allCodeLines.length), allCodeLines.length);
+
+  useEffect(() => {
+    onNextRef.current = onNext;
+  }, [onNext]);
 
   useEffect(() => {
     timer.current = setInterval(() => {
@@ -93,7 +98,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
           clearInterval(timer.current);
           if (!done.current) {
             done.current = true;
-            setTimeout(onNext, 600);
+            setTimeout(() => onNextRef.current?.(), 600);
           }
           return 100;
         }
@@ -102,17 +107,6 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
     }, 120);
     return () => clearInterval(timer.current);
   }, []);
-
-  useEffect(() => {
-    if (progress > 50 && assetCount < 7) setAssetCount(Math.floor(progress/10));
-    if (progress > 55 && activeNode === 2) { setDoneNodes([0,1,2]); setActiveNode(3); }
-    if (progress > 70 && activeNode === 3) { setDoneNodes([0,1,2,3]); setActiveNode(4); }
-    if (progress > 80 && activeNode === 4) { setDoneNodes([0,1,2,3,4]); setActiveNode(5); }
-    if (progress > 90 && activeNode === 5) { setDoneNodes([0,1,2,3,4,5]); setActiveNode(6); }
-    // sync visible lines with progress (0→95% maps to full line count)
-    const target = Math.min(Math.floor((progress / 95) * allCodeLines.length), allCodeLines.length);
-    if (target > visibleLines) setVisibleLines(target);
-  }, [progress]);
 
   // auto-scroll code panel
   useEffect(() => {

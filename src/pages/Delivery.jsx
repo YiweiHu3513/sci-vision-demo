@@ -711,11 +711,6 @@ export default function Delivery({
     videoRef.current.currentTime = p * duration;
   };
 
-  const handleProgressDrag = (e) => {
-    if (!dragging) return;
-    seekTo(e);
-  };
-
   useEffect(() => {
     const up = () => setDragging(false);
     const move = (e) => { if (dragging) seekTo(e); };
@@ -813,7 +808,7 @@ export default function Delivery({
         projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={4} />
+      <StepBar active={5} />
 
       <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>

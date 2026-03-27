@@ -1,5 +1,5 @@
 export default function StepBar({ active = 0 }) {
-  const steps = ['上传论文','分析确认','配置参数','生成中','完成'];
+  const steps = ['上传论文','分析确认','配置参数','生成中','创意工坊','完成'];
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '18px 0 0', gap: 0 }}>
       {steps.map((step, i) => {
@@ -10,8 +10,8 @@ export default function StepBar({ active = 0 }) {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 80 }}>
               <div style={{
                 width: 22, height: 22, borderRadius: '50%',
-                background: done || act ? 'var(--sage)' : 'transparent',
-                border: `1.5px solid ${done || act ? 'var(--sage)' : 'var(--border)'}`,
+                background: done || act ? (i === 4 ? 'var(--lav)' : 'var(--sage)') : 'transparent',
+                border: `1.5px solid ${done || act ? (i === 4 ? 'var(--lav)' : 'var(--sage)') : 'var(--border)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 10, fontWeight: 700,
                 color: done || act ? '#fff' : 'var(--text-l)',
@@ -26,7 +26,7 @@ export default function StepBar({ active = 0 }) {
             </div>
             {i < steps.length - 1 && (
               <div style={{
-                width: 80, height: 1.5, marginTop: -14,
+                width: 56, height: 1.5, marginTop: -14,
                 background: done ? 'var(--sage)' : 'var(--border)'
               }} />
             )}

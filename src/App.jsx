@@ -4,6 +4,7 @@ import Upload from './pages/Upload';
 import Analysis from './pages/Analysis';
 import Config from './pages/Config';
 import Pipeline from './pages/Pipeline';
+import CreativeStudio from './pages/CreativeStudio';
 import Delivery from './pages/Delivery';
 import Library from './pages/Library';
 import AuthModal from './components/AuthModal';
@@ -112,7 +113,7 @@ export default function App() {
     const proj = projects.find(p => p.id === id);
     if (proj) {
       setCurrentProjectName(proj.name);
-      setStep(4); // Go to Delivery
+      setStep(5); // Go to Delivery
       setView('workflow');
       // Animate
       if (!busyRef.current) {
@@ -177,7 +178,8 @@ export default function App() {
             {step === 1 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
             {step === 2 && <Config   onNext={() => goTo(3)} {...navProps} />}
             {step === 3 && <Pipeline onNext={() => goTo(4)} {...navProps} />}
-            {step === 4 && <Delivery onReset={handleNewProject} {...navProps} />}
+            {step === 4 && <CreativeStudio onNext={() => goTo(5)} {...navProps} />}
+            {step === 5 && <Delivery onReset={handleNewProject} {...navProps} />}
           </>
         )}
       </div>

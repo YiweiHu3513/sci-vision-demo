@@ -22,6 +22,15 @@ const initialMessages = [
 
 const hints = ['作者信息有误', '领域分类不准确', '核心贡献描述需要修正', '图表描述遗漏'];
 
+function computeReplyDelayMs(text) {
+  // Use a deterministic hash to keep response delay varied without impure randomness in component scope.
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(i)) >>> 0;
+  }
+  return 1800 + (hash % 801); // 1800~2600ms
+}
+
 // 铅笔图标
 function PencilIcon({ color = 'var(--text-l)' }) {
   return (
@@ -140,7 +149,7 @@ export default function Analysis({ onNext, user, onOpenAuth, onLogout, onNavLibr
         role: 'ai',
         text: `已记录您的反馈：「${text}」。我将在生成时重点关注这一点，并在配置页为您预设相关选项。`,
       }]);
-    }, 500 + 1800 + Math.random() * 800);
+    }, 500 + computeReplyDelayMs(text));
   };
 
   return (
