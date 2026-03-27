@@ -60,7 +60,7 @@ export default function CreativeStudio({
         onNavLibrary={onNavLibrary} projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={5} />
+      <StepBar active={5} onGoToStep={onGoToStep} />
 
       {/* Tab switcher + skip link */}
       <div style={{

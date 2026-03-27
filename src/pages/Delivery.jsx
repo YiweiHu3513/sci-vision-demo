@@ -837,7 +837,7 @@ export default function Delivery({
         projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={6} />
+      <StepBar active={6} onGoToStep={onGoToStep} />
 
       <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>

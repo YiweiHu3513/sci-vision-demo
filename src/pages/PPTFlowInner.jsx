@@ -275,7 +275,7 @@ function PPTConfig({ scene, onSubmit, onBack }) {
 }
 
 /* ── Step 3: 等待生成 ── */
-function PPTGenerating({ config, onDone }) {
+function PPTGenerating({ config, onDone, onCancel }) {
   const [stageIdx, setStageIdx] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const doneRef = useRef(false);
@@ -330,7 +330,20 @@ function PPTGenerating({ config, onDone }) {
           );
         })}
       </div>
-      <div style={{ fontSize: 11, color: 'var(--text-l)', marginTop: 16 }}>预计剩余时间：~{Math.max(1, Math.round((totalDuration - elapsed) / 1000))} 秒</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 16 }}>
+        <span style={{ fontSize: 11, color: 'var(--text-l)' }}>预计剩余时间：~{Math.max(1, Math.round((totalDuration - elapsed) / 1000))} 秒</span>
+        {onCancel && (
+          <button onClick={onCancel}
+            style={{
+              border: '1px solid var(--border)', background: 'var(--card)',
+              borderRadius: 8, padding: '5px 14px', fontSize: 11, fontWeight: 600,
+              color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#C45C5C'; e.currentTarget.style.color = '#C45C5C'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-m)'; }}
+          >取消</button>
+        )}
+      </div>
     </div>
   );
 }
@@ -459,7 +472,7 @@ export default function PPTFlowInner({ onDone, isDone, onSwitchToPoster }) {
       <SubStepBar active={subStep} />
       {subStep === 0 && <SceneSelect onSelect={(id) => { setSelectedScene(id); setSubStep(1); }} />}
       {subStep === 1 && <PPTConfig scene={selectedScene} onSubmit={(cfg) => { setConfig(cfg); setSubStep(2); }} onBack={() => setSubStep(0)} />}
-      {subStep === 2 && <PPTGenerating config={config} onDone={() => setSubStep(3)} />}
+      {subStep === 2 && <PPTGenerating config={config} onDone={() => setSubStep(3)} onCancel={() => setSubStep(1)} />}
       {subStep === 3 && <PPTPreview config={config} onDone={onDone} isDone={isDone} onSwitchToPoster={onSwitchToPoster} />}
       <style>{`@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }`}</style>
     </>

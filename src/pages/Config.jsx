@@ -173,7 +173,7 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={3} />
+      <StepBar active={3} onGoToStep={onGoToStep} />
 
       <div style={{ flex:1, padding:'12px 20px 18px', minHeight:0 }}>
         <div style={{ width:'100%', maxWidth:1360, margin:'0 auto', display:'flex', flexDirection:'column', minHeight:'100%' }}>

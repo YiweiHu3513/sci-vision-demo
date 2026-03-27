@@ -47,7 +47,7 @@ export default function ModeSelect({
         onNavLibrary={onNavLibrary} projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={0} />
+      <StepBar active={0} onGoToStep={onGoToStep} />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 24px 40px' }}>
         {/* Header */}

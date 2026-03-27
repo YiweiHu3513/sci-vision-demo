@@ -75,7 +75,7 @@ const DAG_CANVAS_HEIGHT = 320;
 const ASSET_CARD_HEIGHT = 118;
 const MAX_ASSET_SLOTS = 8;
 
-export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
+export default function Pipeline({ onNext, onCancel, user, onOpenAuth, onLogout, onNavLibrary, onGoHome, onGoToStep, projectName, onProjectNameChange }) {
   const [progress, setProgress] = useState(0);
   const timer = useRef(null);
   const codeRef = useRef(null);
@@ -140,7 +140,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={4} />
+      <StepBar active={4} onGoToStep={onGoToStep} />
 
       <div style={{ padding:'12px 24px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:6 }}>
@@ -148,7 +148,21 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
             <h2 style={{ fontSize:18, fontWeight:700 }}>AI 正在生成...</h2>
             <p style={{ fontSize:13, color:'var(--text-l)', marginTop:2 }}>流水线处理中，完成后自动跳转</p>
           </div>
-          <span style={{ fontSize:13, color:'var(--sage)', fontWeight:700 }}>{Math.round(progress)}%</span>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <span style={{ fontSize:13, color:'var(--sage)', fontWeight:700 }}>{Math.round(progress)}%</span>
+            {onCancel && (
+              <button onClick={() => { clearInterval(timer.current); onCancel(); }}
+                style={{
+                  border:'1px solid var(--border)', background:'var(--card)',
+                  borderRadius:8, padding:'5px 14px', fontSize:11, fontWeight:600,
+                  color:'var(--text-m)', cursor:'pointer', fontFamily:'inherit',
+                  transition:'all 0.15s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor='#C45C5C'; e.currentTarget.style.color='#C45C5C'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--text-m)'; }}
+              >取消生成</button>
+            )}
+          </div>
         </div>
         <div style={{ height:6, background:'var(--bg2)', borderRadius:3, marginBottom:20 }}>
           <div style={{ height:'100%', width:`${progress}%`, background:'var(--sage)', borderRadius:3, transition:'width .3s' }}/>

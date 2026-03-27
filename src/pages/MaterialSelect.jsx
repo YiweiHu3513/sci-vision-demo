@@ -180,7 +180,7 @@ export default function MaterialSelect({
         onNavLibrary={onNavLibrary}
         projectName={projectName} onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={2} />
+      <StepBar active={2} onGoToStep={onGoToStep} />
 
       {/* Header */}
       <div style={{ textAlign: 'center', padding: '36px 24px 8px' }}>

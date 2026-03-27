@@ -194,6 +194,22 @@ export default function App() {
     goTo(selectedOutputs.video ? 5 : 6);
   };
 
+  // Pipeline cancel → back to Config
+  const handlePipelineCancel = () => {
+    goTo(4);
+  };
+
+  // StepBar click → map stepbar index to internal step number
+  // StepBar indices: 0=上传, 1=分析, 2=选择物料, 3=配置, 4=生成中, 5=创意工坊, 6=完成
+  // Internal steps: 0=Upload, 1=ModeSelect, 2=Analysis, 3=MaterialSelect, 4=Config, 5=Pipeline, 6=CreativeStudio, 7=Delivery
+  const stepBarIndexToInternalStep = { 0: 0, 1: 2, 2: 3, 3: 4, 5: 6, 6: 7 };
+  const handleStepBarClick = (stepBarIndex) => {
+    const internalStep = stepBarIndexToInternalStep[stepBarIndex];
+    if (internalStep !== undefined) {
+      goTo(internalStep);
+    }
+  };
+
   const authProps = {
     user,
     onOpenAuth: () => setAuthOpen(true),
@@ -204,6 +220,7 @@ export default function App() {
     ...authProps,
     onNavLibrary: () => switchView('library'),
     onGoHome: handleNewProject,
+    onGoToStep: handleStepBarClick,
     projectName: (view === 'workflow' && step > 0) || view === 'agent' ? currentProjectName : undefined,
     onProjectNameChange: (name) => setCurrentProjectName(name),
   };
@@ -239,13 +256,13 @@ export default function App() {
         {view === 'workflow' && (
           <>
             {step === 0 && <Upload   onNext={handleUploadNext} {...navProps} />}
-            {step === 1 && <ModeSelect onSelectAgent={handleSelectAgent} onSelectManual={handleSelectManual} {...navProps} />}
-            {step === 2 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
-            {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 4 && <Config   onNext={handleConfigNext} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 5 && <Pipeline onNext={() => goTo(6)} {...navProps} />}
-            {step === 6 && <CreativeStudio onNext={() => goTo(7)} selectedOutputs={selectedOutputs} {...navProps} />}
-            {step === 7 && <Delivery onReset={handleNewProject} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 1 && <ModeSelect onSelectAgent={handleSelectAgent} onSelectManual={handleSelectManual} onBack={() => goTo(0)} {...navProps} />}
+            {step === 2 && <Analysis onNext={handleAnalysisNext} onBack={() => goTo(1)} {...navProps} />}
+            {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} onBack={() => goTo(2)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 4 && <Config   onNext={handleConfigNext} onBack={() => goTo(3)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 5 && <Pipeline onNext={() => goTo(6)} onCancel={handlePipelineCancel} {...navProps} />}
+            {step === 6 && <CreativeStudio onNext={() => goTo(7)} onBack={() => goTo(selectedOutputs.video ? 5 : 4)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 7 && <Delivery onReset={handleNewProject} onBack={() => goTo(6)} selectedOutputs={selectedOutputs} {...navProps} />}
           </>
         )}
       </div>

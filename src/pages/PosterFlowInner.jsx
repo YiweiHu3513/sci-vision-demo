@@ -310,7 +310,7 @@ function ProposalSelect({ journal, onSelect, onBack }) {
 }
 
 /* ── Step 4: 预览与下载 ── */
-function PosterPreview({ proposal, journal, onBackToProposals, onDone, isDone, onSwitchToPPT }) {
+function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneration, onDone, isDone, onSwitchToPPT }) {
   const [generating, setGenerating] = useState(true);
   const [activeLayout, setActiveLayout] = useState('portrait');
   const [showModifyPanel, setShowModifyPanel] = useState(false);
@@ -349,6 +349,17 @@ function PosterPreview({ proposal, journal, onBackToProposals, onDone, isDone, o
         <div style={{ height: 6, background: 'var(--bg2)', borderRadius: 3, maxWidth: 320, margin: '0 auto' }}>
           <div style={{ height: '100%', borderRadius: 3, background: 'var(--sage)', animation: 'progressFill 4s ease forwards' }} />
         </div>
+        {onCancelGeneration && (
+          <button onClick={onCancelGeneration}
+            style={{
+              marginTop: 20, border: '1px solid var(--border)', background: 'var(--card)',
+              borderRadius: 8, padding: '5px 14px', fontSize: 11, fontWeight: 600,
+              color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#C45C5C'; e.currentTarget.style.color = '#C45C5C'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-m)'; }}
+          >取消</button>
+        )}
       </div>
     );
   }
@@ -526,7 +537,7 @@ export default function PosterFlowInner({ onDone, isDone, onSwitchToPPT }) {
       {subStep === 0 && <StyleSelect onSelect={(id) => { setSelectedStyle(id); if (id === 'journal') setSubStep(1); }} />}
       {subStep === 1 && <JournalSelect onSelect={(id) => { setSelectedJournal(id); setSubStep(2); }} onBack={() => setSubStep(0)} />}
       {subStep === 2 && <ProposalSelect journal={selectedJournal} onSelect={(p) => { setSelectedProposal(p); setSubStep(3); }} onBack={() => setSubStep(1)} />}
-      {subStep === 3 && <PosterPreview proposal={selectedProposal} journal={selectedJournal} onBackToProposals={() => setSubStep(2)} onDone={onDone} isDone={isDone} onSwitchToPPT={onSwitchToPPT} />}
+      {subStep === 3 && <PosterPreview proposal={selectedProposal} journal={selectedJournal} onBackToProposals={() => setSubStep(2)} onCancelGeneration={() => setSubStep(2)} onDone={onDone} isDone={isDone} onSwitchToPPT={onSwitchToPPT} />}
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

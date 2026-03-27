@@ -155,7 +155,7 @@ export default function Analysis({ onNext, user, onOpenAuth, onLogout, onNavLibr
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={1} />
+      <StepBar active={1} onGoToStep={onGoToStep} />
 
       <div style={{ display: 'flex', gap: 16, padding: '16px 24px', height: 'calc(100vh - 120px)' }}>
 
