@@ -13,7 +13,7 @@ export default function Navbar({
   const [dropOpen, setDropOpen] = useState(false);
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || '用户';
 
-  const navItems = ['案例','项目库','定价','关于'];
+  const navItems = ['首页','案例','项目库','定价','关于'];
 
   return (
     <nav style={{
@@ -67,6 +67,7 @@ export default function Navbar({
             href="#"
             onClick={e => {
               e.preventDefault();
+              if (item === '首页' && onGoHome) onGoHome();
               if (item === '项目库' && onNavLibrary) onNavLibrary();
             }}
             style={{

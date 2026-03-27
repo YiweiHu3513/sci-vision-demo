@@ -146,8 +146,15 @@ export default function App() {
   const handleNewProject = () => {
     setCurrentProjectName('');
     setSelectedOutputs({ video: true, poster: true, ppt: true });
-    switchView('workflow');
-    setTimeout(() => setStep(0), 50);
+    // Force reset — bypass busyRef to ensure it always works
+    busyRef.current = false;
+    setAnimIn(false);
+    setTimeout(() => {
+      setStep(0);
+      setView('workflow');
+      setAnimIn(true);
+      setTimeout(() => { busyRef.current = false; }, 700);
+    }, 300);
   };
 
   // Upload → ModeSelect
