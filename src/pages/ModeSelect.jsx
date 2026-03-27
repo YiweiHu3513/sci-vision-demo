@@ -35,6 +35,8 @@ const MODES = [
 export default function ModeSelect({
   onSelectAgent,
   onSelectManual,
+  onBack,
+  onGoToStep,
   user, onOpenAuth, onLogout, onNavLibrary,
   projectName, onProjectNameChange,
 }) {
@@ -50,6 +52,11 @@ export default function ModeSelect({
       <StepBar active={0} onGoToStep={onGoToStep} />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 24px 40px' }}>
+        {onBack && (
+          <div style={{ marginBottom: 12 }}>
+            <button onClick={onBack} style={{ border: '1px solid var(--border)', background: 'transparent', borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit' }}>← 上一步</button>
+          </div>
+        )}
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>论文已就绪，接下来你想怎么做？</h2>
