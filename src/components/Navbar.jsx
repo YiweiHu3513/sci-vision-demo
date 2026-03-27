@@ -5,13 +5,15 @@ export default function Navbar({
   showLogin = false, user, onOpenAuth, onLogout,
   // Library integration
   onNavLibrary, activeNav,
+  // Home navigation
+  onGoHome,
   // Project name (workflow view)
   projectName, onProjectNameChange,
 }) {
   const [dropOpen, setDropOpen] = useState(false);
   const displayName = user?.user_metadata?.username || user?.email?.split('@')[0] || '用户';
 
-  const navItems = ['产品','案例','项目库','定价','关于'];
+  const navItems = ['案例','项目库','定价','关于'];
 
   return (
     <nav style={{
@@ -22,8 +24,18 @@ export default function Navbar({
       display: 'flex', alignItems: 'center',
       padding: '0 32px',
     }}>
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* Logo — clickable, always goes home */}
+      <div
+        onClick={onGoHome}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          cursor: onGoHome ? 'pointer' : 'default',
+          userSelect: 'none',
+          transition: 'opacity 0.15s',
+        }}
+        onMouseEnter={e => { if (onGoHome) e.currentTarget.style.opacity = '0.7'; }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+      >
         <div style={{
           width: 16, height: 16, borderRadius: '50%',
           border: '1.5px solid var(--text-d)'

@@ -196,6 +196,7 @@ export default function App() {
   const navProps = {
     ...authProps,
     onNavLibrary: () => switchView('library'),
+    onGoHome: handleNewProject,
     projectName: (view === 'workflow' && step > 0) || view === 'agent' ? currentProjectName : undefined,
     onProjectNameChange: (name) => setCurrentProjectName(name),
   };
