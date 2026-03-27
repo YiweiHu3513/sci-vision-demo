@@ -622,6 +622,7 @@ const ctrlBtnStyle = {
 
 export default function Delivery({
   onReset,
+  onGoToStep,
   user,
   onOpenAuth,
   onLogout,

@@ -21,6 +21,7 @@ const TABS = [
 
 export default function CreativeStudio({
   onNext,
+  onGoToStep,
   user, onOpenAuth, onLogout, onNavLibrary,
   projectName, onProjectNameChange,
   selectedOutputs,
