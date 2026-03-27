@@ -153,14 +153,14 @@ export default function Pipeline({ onNext, onCancel, user, onOpenAuth, onLogout,
             {onCancel && (
               <button onClick={() => { clearInterval(timer.current); onCancel(); }}
                 style={{
-                  border:'1px solid var(--border)', background:'var(--card)',
-                  borderRadius:8, padding:'5px 14px', fontSize:11, fontWeight:600,
-                  color:'var(--text-m)', cursor:'pointer', fontFamily:'inherit',
+                  border:'1.5px solid #C45C5C', background:'rgba(196,92,92,0.06)',
+                  borderRadius:8, padding:'7px 18px', fontSize:12, fontWeight:700,
+                  color:'#C45C5C', cursor:'pointer', fontFamily:'inherit',
                   transition:'all 0.15s',
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor='#C45C5C'; e.currentTarget.style.color='#C45C5C'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.color='var(--text-m)'; }}
-              >取消生成</button>
+                onMouseEnter={e => { e.currentTarget.style.background='#C45C5C'; e.currentTarget.style.color='#fff'; }}
+                onMouseLeave={e => { e.currentTarget.style.background='rgba(196,92,92,0.06)'; e.currentTarget.style.color='#C45C5C'; }}
+              >✕ 取消生成</button>
             )}
           </div>
         </div>
