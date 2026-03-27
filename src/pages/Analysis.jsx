@@ -212,7 +212,7 @@ export default function Analysis({ onNext, user, onOpenAuth, onLogout, onNavLibr
               background:'var(--sage)', color:'#fff',
               border:'none', borderRadius:12,
               fontSize:15, fontWeight:700, fontFamily:'inherit',
-            }}>分析结果确认，进入配置  →</button>
+            }}>确认分析结果，继续 →</button>
             <p style={{ fontSize:11, color:'var(--text-l)', textAlign:'center', marginTop:8 }}>
               你也可以先在右侧聊天框校正分析结果
             </p>

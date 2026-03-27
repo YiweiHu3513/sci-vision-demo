@@ -159,8 +159,10 @@ function calcEstimate(configs) {
   return { timeStr: timeStr.trim(), pts: totalPts };
 }
 
-export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
+export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange, selectedOutputs }) {
   const [configs, setConfigs] = useState(INITIAL);
+  const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
+  const hasVideo = outputs.video;
 
   const update = (label, val) => {
     setConfigs(c => ({ ...c, [label]: { val, fromChat: false } }));
@@ -171,7 +173,7 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={2} />
+      <StepBar active={3} />
 
       <div style={{ flex:1, padding:'12px 20px 18px', minHeight:0 }}>
         <div style={{ width:'100%', maxWidth:1360, margin:'0 auto', display:'flex', flexDirection:'column', minHeight:'100%' }}>
@@ -238,12 +240,26 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
               minHeight:0,
             }}>
               <div style={{ marginBottom:10 }}>
-                <div style={{ fontWeight:700, fontSize:14, marginBottom:2 }}>视频生成配置</div>
-                <div style={{ fontSize:11, color:'var(--text-l)' }}>分组调整参数，先定叙事，再定风格，最后确认交付格式</div>
+                <div style={{ fontWeight:700, fontSize:14, marginBottom:2 }}>{hasVideo ? '视频生成配置' : '生成配置'}</div>
+                <div style={{ fontSize:11, color:'var(--text-l)' }}>{hasVideo ? '分组调整参数，先定叙事，再定风格，最后确认交付格式' : '已跳过视频，将直接进入创意工坊'}</div>
               </div>
 
               <div style={{ flex:1, minHeight:0, overflowY:'auto', paddingRight:2 }}>
-                {CONFIG_GROUPS.map((group) => {
+                {!hasVideo && (
+                  <div style={{
+                    padding:'20px', borderRadius:12, marginBottom:10,
+                    border:'1px dashed var(--border)', background:'var(--bg2)',
+                    textAlign:'center',
+                  }}>
+                    <div style={{ fontSize:28, marginBottom:8 }}>⚡</div>
+                    <div style={{ fontSize:13, fontWeight:700, marginBottom:4 }}>快速模式</div>
+                    <div style={{ fontSize:11, color:'var(--text-l)', lineHeight:1.6 }}>
+                      已跳过视频生成，点击下方按钮直接进入
+                      {outputs.poster && outputs.ppt ? '海报和 PPT 设计' : outputs.poster ? '海报设计' : 'PPT 设计'}
+                    </div>
+                  </div>
+                )}
+                {hasVideo && CONFIG_GROUPS.map((group) => {
                   const tint = group.id === 'narrative'
                     ? 'rgba(100, 140, 108, 0.08)'
                     : group.id === 'visual'
@@ -320,16 +336,22 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
               }}>
                 <button onClick={onNext} style={{
                   width:'100%', padding:'14px',
-                  background:'linear-gradient(180deg, #6f9876 0%, var(--sage) 100%)',
+                  background: hasVideo
+                    ? 'linear-gradient(180deg, #6f9876 0%, var(--sage) 100%)'
+                    : 'linear-gradient(180deg, #8A7CA0 0%, var(--lav) 100%)',
                   color:'#fff',
                   border:'none', borderRadius:11,
                   fontSize:15, fontWeight:700, fontFamily:'inherit',
                   cursor:'pointer',
-                  boxShadow:'0 6px 16px rgba(90, 130, 100, 0.25)',
-                }}>▶  开始生成视频</button>
-                <p style={{ fontSize:10, color:'var(--text-l)', textAlign:'center', marginTop:6, marginBottom:0 }}>
-                  预计生成时间：{estimate.timeStr} · 消耗积分：{estimate.pts}
-                </p>
+                  boxShadow: hasVideo
+                    ? '0 6px 16px rgba(90, 130, 100, 0.25)'
+                    : '0 6px 16px rgba(138, 124, 160, 0.25)',
+                }}>{hasVideo ? '▶  开始生成视频' : '✦  进入创意工坊'}</button>
+                {hasVideo && (
+                  <p style={{ fontSize:10, color:'var(--text-l)', textAlign:'center', marginTop:6, marginBottom:0 }}>
+                    预计生成时间：{estimate.timeStr} · 消耗积分：{estimate.pts}
+                  </p>
+                )}
               </div>
             </div>
           </div>

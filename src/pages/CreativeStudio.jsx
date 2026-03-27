@@ -23,16 +23,30 @@ export default function CreativeStudio({
   onNext,
   user, onOpenAuth, onLogout, onNavLibrary,
   projectName, onProjectNameChange,
+  selectedOutputs,
 }) {
-  const [activeTab, setActiveTab] = useState('poster');
+  const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
+  const showPoster = outputs.poster;
+  const showPPT = outputs.ppt;
+  const visibleTabs = TABS.filter(t =>
+    (t.key === 'poster' && showPoster) || (t.key === 'ppt' && showPPT)
+  );
+
+  const [activeTab, setActiveTab] = useState(showPoster ? 'poster' : 'ppt');
   const [posterDone, setPosterDone] = useState(false);
   const [pptDone, setPptDone] = useState(false);
 
-  const anyDone = posterDone || pptDone;
-  const allDone = posterDone && pptDone;
+  // If only one output type, mark the other as "done" so it doesn't block
+  const effectivePosterDone = showPoster ? posterDone : true;
+  const effectivePptDone = showPPT ? pptDone : true;
+
+  const anyDone = effectivePosterDone || effectivePptDone;
+  const allDone = effectivePosterDone && effectivePptDone;
 
   // Summary text for the floating bar
   const getSummaryText = () => {
+    if (!showPoster && showPPT) return pptDone ? 'PPT 已完成' : '';
+    if (showPoster && !showPPT) return posterDone ? '海报已完成' : '';
     if (allDone) return '海报和 PPT 都已完成';
     if (posterDone) return '海报已完成 · PPT 可稍后再做';
     if (pptDone) return 'PPT 已完成 · 海报可稍后再做';
@@ -46,18 +60,18 @@ export default function CreativeStudio({
         onNavLibrary={onNavLibrary} projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={4} />
+      <StepBar active={5} />
 
-      {/* Tab switcher */}
+      {/* Tab switcher + skip link */}
       <div style={{
-        display: 'flex', justifyContent: 'center', padding: '10px 0 0',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 0 0', gap: 6,
       }}>
         <div style={{
           display: 'inline-flex', gap: 4, padding: '4px 5px',
           borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)',
           boxShadow: 'var(--shadow)',
         }}>
-          {TABS.map((tab) => {
+          {visibleTabs.map((tab) => {
             const isActive = activeTab === tab.key;
             const isDone = tab.key === 'poster' ? posterDone : pptDone;
             return (
@@ -89,23 +103,41 @@ export default function CreativeStudio({
             );
           })}
         </div>
+        {!anyDone && (
+          <button
+            onClick={onNext}
+            style={{
+              border: 'none', background: 'transparent',
+              color: 'var(--text-l)', fontSize: 11, fontWeight: 600,
+              cursor: 'pointer', fontFamily: 'inherit',
+              padding: '2px 8px',
+              transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = 'var(--text-d)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-l)'}
+          >跳过，直接查看结果 →</button>
+        )}
       </div>
 
-      {/* Content area — both always mounted, toggle visibility */}
-      <div style={{ display: activeTab === 'poster' ? 'block' : 'none' }}>
-        <PosterFlowInner
-          onDone={() => setPosterDone(true)}
-          isDone={posterDone}
-          onSwitchToPPT={() => setActiveTab('ppt')}
-        />
-      </div>
-      <div style={{ display: activeTab === 'ppt' ? 'block' : 'none' }}>
-        <PPTFlowInner
-          onDone={() => setPptDone(true)}
-          isDone={pptDone}
-          onSwitchToPoster={() => setActiveTab('poster')}
-        />
-      </div>
+      {/* Content area — mounted tabs use display toggle to preserve state */}
+      {showPoster && (
+        <div style={{ display: activeTab === 'poster' ? 'block' : 'none' }}>
+          <PosterFlowInner
+            onDone={() => setPosterDone(true)}
+            isDone={posterDone}
+            onSwitchToPPT={showPPT ? () => setActiveTab('ppt') : null}
+          />
+        </div>
+      )}
+      {showPPT && (
+        <div style={{ display: activeTab === 'ppt' ? 'block' : 'none' }}>
+          <PPTFlowInner
+            onDone={() => setPptDone(true)}
+            isDone={pptDone}
+            onSwitchToPoster={showPoster ? () => setActiveTab('poster') : null}
+          />
+        </div>
+      )}
 
       {/* Floating bottom bar — appears when at least one module is done */}
       {anyDone && (
@@ -119,8 +151,8 @@ export default function CreativeStudio({
         }}>
           {/* Status badges */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <StatusBadge label="海报" done={posterDone} color="var(--lav)" />
-            <StatusBadge label="PPT" done={pptDone} color="var(--dust)" />
+            {showPoster && <StatusBadge label="海报" done={posterDone} color="var(--lav)" />}
+            {showPPT && <StatusBadge label="PPT" done={pptDone} color="var(--dust)" />}
           </div>
 
           <div style={{ width: 1, height: 24, background: 'var(--border)' }} />

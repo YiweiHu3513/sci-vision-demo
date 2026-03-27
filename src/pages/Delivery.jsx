@@ -10,12 +10,14 @@ const slides = Array.from({ length: 12 }, (_, i) => ({
   thumb: `/demo-samples/ppt-thumbs/slide-${String(i + 1).padStart(2, '0')}.png`,
 }));
 
-const stats = [
-  ['处理时长', '18.3 秒'],
-  ['生成图片', '12 张'],
-  ['脚本段落', '10 段'],
-  ['视频时长', '2:00'],
-];
+const allStats = {
+  time: ['处理时长', '18.3 秒'],
+  images: ['生成图片', '12 张'],
+  scripts: ['脚本段落', '10 段'],
+  videoDur: ['视频时长', '2:00'],
+  posterCount: ['海报版式', '3 版'],
+  pptPages: ['PPT 页数', '12 页'],
+};
 
 const mediaTabs = [
   { key: 'all', label: '全部' },
@@ -626,7 +628,17 @@ export default function Delivery({
   onNavLibrary,
   projectName,
   onProjectNameChange,
+  selectedOutputs,
 }) {
+  const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
+  // Filter media tabs based on what user selected
+  const visibleTabs = mediaTabs.filter(t => {
+    if (t.key === 'all') return true; // always show "全部"
+    if (t.key === 'video') return outputs.video;
+    if (t.key === 'ppt') return outputs.ppt;
+    if (t.key === 'poster') return outputs.poster;
+    return true;
+  });
   const [activeMedia, setActiveMedia] = useState('all');
   const [currentRes, setCurrentRes] = useState(resolutions[0]);
   const [pendingRes, setPendingRes] = useState(null);
@@ -794,9 +806,26 @@ export default function Delivery({
     { key: 'share', icon: '⬡', label: '生成分享链接', sub: '暂未启用', color: 'var(--lav)' },
   ];
 
-  const showVideo = activeMedia === 'all' || activeMedia === 'video';
-  const showPpt = activeMedia === 'all' || activeMedia === 'ppt';
-  const showPosterPanel = activeMedia === 'poster';
+  // Filter export items based on what user selected
+  const filteredExport = dynamicExport.filter(item => {
+    if (item.key === 'video') return outputs.video;
+    if (item.key === 'ppt') return outputs.ppt;
+    if (item.key === 'poster') return outputs.poster;
+    if (item.key === 'pdf') return outputs.video; // script PDF only with video
+    return true;
+  });
+
+  // Dynamic stats based on selected outputs
+  const stats = [
+    allStats.time,
+    ...(outputs.video ? [allStats.images, allStats.scripts, allStats.videoDur] : []),
+    ...(outputs.poster ? [allStats.posterCount] : []),
+    ...(outputs.ppt ? [allStats.pptPages] : []),
+  ];
+
+  const showVideo = outputs.video && (activeMedia === 'all' || activeMedia === 'video');
+  const showPpt = (activeMedia === 'all' || activeMedia === 'ppt') && outputs.ppt;
+  const showPosterPanel = activeMedia === 'poster' && outputs.poster;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
@@ -808,7 +837,7 @@ export default function Delivery({
         projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={5} />
+      <StepBar active={6} />
 
       <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>
@@ -835,7 +864,7 @@ export default function Delivery({
               background: 'var(--card)',
             }}
           >
-            {mediaTabs.map((tab) => (
+            {visibleTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveMedia(tab.key)}
@@ -1072,12 +1101,12 @@ export default function Delivery({
               />
             </div>
           )}
-          {/* "全部" tab: poster thumbnail + PPT carousel side by side */}
-          {activeMedia === 'all' && (
+          {/* "全部" tab: poster thumbnail + PPT carousel (conditional) */}
+          {activeMedia === 'all' && (outputs.poster || outputs.ppt) && (
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: '180px minmax(0, 1fr)',
+                gridTemplateColumns: outputs.poster && outputs.ppt ? '180px minmax(0, 1fr)' : '1fr',
                 gap: 14,
                 marginTop: 12,
                 minHeight: 0,
@@ -1087,36 +1116,40 @@ export default function Delivery({
               }}
             >
               {/* Poster thumbnail */}
-              <div
-                onClick={() => setShowPosterPreview(true)}
-                style={{
-                  flex: '0 0 180px', borderRadius: 12, overflow: 'hidden',
-                  border: '1px solid var(--border)', background: 'var(--card)',
-                  boxShadow: 'var(--shadow)', cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column',
-                  transition: 'box-shadow 0.15s',
-                }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
-              >
-                <img
-                  src={activePoster.url}
-                  alt={`海报（${activePoster.label}）`}
-                  loading="eager"
-                  fetchPriority="high"
-                  onLoad={() => markPosterReady(activePoster.key)}
+              {outputs.poster && (
+                <div
+                  onClick={() => setShowPosterPreview(true)}
                   style={{
-                    width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
+                    flex: '0 0 180px', borderRadius: 12, overflow: 'hidden',
+                    border: '1px solid var(--border)', background: 'var(--card)',
+                    boxShadow: 'var(--shadow)', cursor: 'pointer',
+                    display: 'flex', flexDirection: 'column',
+                    transition: 'box-shadow 0.15s',
                   }}
-                />
-                <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
-                  🖼 海报预览
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = 'var(--shadow)'}
+                >
+                  <img
+                    src={activePoster.url}
+                    alt={`海报（${activePoster.label}）`}
+                    loading="eager"
+                    fetchPriority="high"
+                    onLoad={() => markPosterReady(activePoster.key)}
+                    style={{
+                      width: '100%', display: 'block', borderBottom: '1px solid var(--border)', objectFit: 'cover',
+                    }}
+                  />
+                  <div style={{ padding: '6px 8px', fontSize: 10, color: 'var(--text-m)', textAlign: 'center' }}>
+                    🖼 海报预览
+                  </div>
                 </div>
-              </div>
+              )}
               {/* PPT carousel */}
-              <div style={{ minWidth: 0, display: 'flex', minHeight: 0, overflow: 'hidden' }}>
-                <SlideCarousel compact />
-              </div>
+              {outputs.ppt && (
+                <div style={{ minWidth: 0, display: 'flex', minHeight: 0, overflow: 'hidden' }}>
+                  <SlideCarousel compact />
+                </div>
+              )}
             </div>
           )}
 
@@ -1239,7 +1272,7 @@ export default function Delivery({
         >
           <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12 }}>导出与分享</div>
 
-          {dynamicExport.map((item, i) => (
+          {filteredExport.map((item, i) => (
             <div
               key={item.key}
               style={{

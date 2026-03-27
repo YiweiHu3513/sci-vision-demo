@@ -140,7 +140,7 @@ export default function Pipeline({ onNext, user, onOpenAuth, onLogout, onNavLibr
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={3} />
+      <StepBar active={4} />
 
       <div style={{ padding:'12px 24px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:6 }}>

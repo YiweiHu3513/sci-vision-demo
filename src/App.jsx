@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import Upload from './pages/Upload';
 import Analysis from './pages/Analysis';
+import MaterialSelect from './pages/MaterialSelect';
 import Config from './pages/Config';
 import Pipeline from './pages/Pipeline';
 import CreativeStudio from './pages/CreativeStudio';
@@ -58,6 +59,17 @@ const DEMO_PROJECTS = [
   },
 ];
 
+/*
+ * Step mapping (7 steps):
+ *   0 = Upload
+ *   1 = Analysis
+ *   2 = MaterialSelect  ← NEW
+ *   3 = Config
+ *   4 = Pipeline (video generation, skipped if no video)
+ *   5 = CreativeStudio (poster + PPT)
+ *   6 = Delivery
+ */
+
 export default function App() {
   const [view, setView] = useState('workflow'); // 'workflow' | 'library'
   const [step, setStep] = useState(0);
@@ -66,6 +78,7 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [projects, setProjects] = useState(DEMO_PROJECTS);
   const [currentProjectName, setCurrentProjectName] = useState('');
+  const [selectedOutputs, setSelectedOutputs] = useState({ video: true, poster: true, ppt: true });
   const busyRef = useRef(false);
 
   useEffect(() => {
@@ -113,9 +126,8 @@ export default function App() {
     const proj = projects.find(p => p.id === id);
     if (proj) {
       setCurrentProjectName(proj.name);
-      setStep(5); // Go to Delivery
+      setStep(6); // Go to Delivery
       setView('workflow');
-      // Animate
       if (!busyRef.current) {
         busyRef.current = true;
         setAnimIn(false);
@@ -129,16 +141,22 @@ export default function App() {
 
   const handleNewProject = () => {
     setCurrentProjectName('');
+    setSelectedOutputs({ video: true, poster: true, ppt: true });
     switchView('workflow');
     setTimeout(() => setStep(0), 50);
   };
 
-  // When moving from Analysis to Config, set project name from paper title
+  // When moving from Analysis to MaterialSelect, set project name from paper title
   const handleAnalysisNext = () => {
     if (!currentProjectName) {
       setCurrentProjectName('Efficient Neural Network Pruning via Gradient-Based Structural Optimization');
     }
-    goTo(2);
+    goTo(2); // → MaterialSelect
+  };
+
+  // Config → Pipeline or CreativeStudio depending on video selection
+  const handleConfigNext = () => {
+    goTo(selectedOutputs.video ? 4 : 5);
   };
 
   const authProps = {
@@ -176,10 +194,11 @@ export default function App() {
           <>
             {step === 0 && <Upload   onNext={() => goTo(1)} {...navProps} />}
             {step === 1 && <Analysis onNext={handleAnalysisNext} {...navProps} />}
-            {step === 2 && <Config   onNext={() => goTo(3)} {...navProps} />}
-            {step === 3 && <Pipeline onNext={() => goTo(4)} {...navProps} />}
-            {step === 4 && <CreativeStudio onNext={() => goTo(5)} {...navProps} />}
-            {step === 5 && <Delivery onReset={handleNewProject} {...navProps} />}
+            {step === 2 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 3 : 5)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 3 && <Config   onNext={handleConfigNext} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
+            {step === 4 && <Pipeline onNext={() => goTo(5)} {...navProps} />}
+            {step === 5 && <CreativeStudio onNext={() => goTo(6)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 6 && <Delivery onReset={handleNewProject} selectedOutputs={selectedOutputs} {...navProps} />}
           </>
         )}
       </div>
