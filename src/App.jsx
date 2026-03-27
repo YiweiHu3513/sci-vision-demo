@@ -223,6 +223,7 @@ export default function App() {
             onOpenProject={handleOpenProject}
             onNewProject={handleNewProject}
             onNavLibrary={() => switchView('library')}
+            onGoHome={handleNewProject}
             {...authProps}
           />
         )}

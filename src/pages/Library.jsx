@@ -150,7 +150,7 @@ function NewProjectCard({ onClick }) {
   );
 }
 
-export default function Library({ projects, onRenameProject, onOpenProject, onNewProject, user, onOpenAuth, onLogout, onNavLibrary }) {
+export default function Library({ projects, onRenameProject, onOpenProject, onNewProject, user, onOpenAuth, onLogout, onNavLibrary, onGoHome }) {
   const [search, setSearch] = useState('');
 
   const filtered = search
@@ -161,7 +161,7 @@ export default function Library({ projects, onRenameProject, onOpenProject, onNe
     <div style={{ minHeight:'100vh', background:'var(--bg)' }}>
       <Navbar
         user={user} onOpenAuth={onOpenAuth} onLogout={onLogout}
-        onNavLibrary={onNavLibrary} activeNav="项目库"
+        onNavLibrary={onNavLibrary} onGoHome={onGoHome} activeNav="项目库"
       />
 
       <div style={{ padding:'24px 32px' }}>
