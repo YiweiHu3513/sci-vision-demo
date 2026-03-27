@@ -159,7 +159,7 @@ function calcEstimate(configs) {
   return { timeStr: timeStr.trim(), pts: totalPts };
 }
 
-export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange, selectedOutputs }) {
+export default function Config({ onNext, onBack, onGoToStep, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange, selectedOutputs }) {
   const [configs, setConfigs] = useState(INITIAL);
   const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
   const hasVideo = outputs.video;
@@ -175,7 +175,13 @@ export default function Config({ onNext, user, onOpenAuth, onLogout, onNavLibrar
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
       <StepBar active={3} onGoToStep={onGoToStep} />
 
-      <div style={{ flex:1, padding:'12px 20px 18px', minHeight:0 }}>
+      {onBack && (
+        <div style={{ padding: '8px 20px 0' }}>
+          <button onClick={onBack} style={{ border: '1px solid var(--border)', background: 'transparent', borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit' }}>← 上一步</button>
+        </div>
+      )}
+
+      <div style={{ flex:1, padding:'8px 20px 18px', minHeight:0 }}>
         <div style={{ width:'100%', maxWidth:1360, margin:'0 auto', display:'flex', flexDirection:'column', minHeight:'100%' }}>
           {/* Header row */}
           <div style={{ marginBottom:12 }}>

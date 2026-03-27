@@ -260,7 +260,7 @@ export default function App() {
             {step === 2 && <Analysis onNext={handleAnalysisNext} onBack={() => goTo(1)} {...navProps} />}
             {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} onBack={() => goTo(2)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
             {step === 4 && <Config   onNext={handleConfigNext} onBack={() => goTo(3)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
-            {step === 5 && <Pipeline onNext={() => goTo(6)} onCancel={handlePipelineCancel} {...navProps} />}
+            {step === 5 && <Pipeline {...navProps} onNext={() => goTo(6)} onCancel={handlePipelineCancel} />}
             {step === 6 && <CreativeStudio onNext={() => goTo(7)} onBack={() => goTo(selectedOutputs.video ? 5 : 4)} selectedOutputs={selectedOutputs} {...navProps} />}
             {step === 7 && <Delivery onReset={handleNewProject} onBack={() => goTo(6)} selectedOutputs={selectedOutputs} {...navProps} />}
           </>

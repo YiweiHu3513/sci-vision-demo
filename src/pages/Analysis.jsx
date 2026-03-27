@@ -126,7 +126,7 @@ function EditableField({ label, value, onChange, multiline }) {
   );
 }
 
-export default function Analysis({ onNext, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
+export default function Analysis({ onNext, onBack, onGoToStep, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [data, setData] = useState(initialData);
   const [msgs, setMsgs] = useState(initialMessages);
   const [input, setInput] = useState('');
@@ -157,7 +157,13 @@ export default function Analysis({ onNext, user, onOpenAuth, onLogout, onNavLibr
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
       <StepBar active={1} onGoToStep={onGoToStep} />
 
-      <div style={{ display: 'flex', gap: 16, padding: '16px 24px', height: 'calc(100vh - 120px)' }}>
+      {onBack && (
+        <div style={{ padding: '8px 24px 0' }}>
+          <button onClick={onBack} style={{ border: '1px solid var(--border)', background: 'transparent', borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit' }}>← 上一步</button>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: 16, padding: '8px 24px', height: 'calc(100vh - 130px)' }}>
 
         {/* 左栏：解析结果 */}
         <div style={{

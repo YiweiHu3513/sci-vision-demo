@@ -151,11 +151,10 @@ function PPTPreview() {
 
 /* ── Main component ── */
 export default function MaterialSelect({
-  onNext,
-  selectedOutputs,
-  onOutputsChange,
+  onNext, onBack,
+  selectedOutputs, onOutputsChange,
   user, onOpenAuth, onLogout, onNavLibrary,
-  projectName, onProjectNameChange,
+  projectName, onProjectNameChange, onGoToStep,
 }) {
   const sel = selectedOutputs || { video: true, poster: true, ppt: true };
   const selectedCount = Object.values(sel).filter(Boolean).length;
@@ -182,8 +181,14 @@ export default function MaterialSelect({
       />
       <StepBar active={2} onGoToStep={onGoToStep} />
 
+      {onBack && (
+        <div style={{ padding: '8px 24px 0' }}>
+          <button onClick={onBack} style={{ border: '1px solid var(--border)', background: 'transparent', borderRadius: 7, padding: '4px 12px', fontSize: 12, fontWeight: 600, color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit' }}>← 上一步</button>
+        </div>
+      )}
+
       {/* Header */}
-      <div style={{ textAlign: 'center', padding: '36px 24px 8px' }}>
+      <div style={{ textAlign: 'center', padding: '20px 24px 8px' }}>
         <h1 style={{
           fontSize: 26, fontWeight: 800, color: 'var(--text-d)',
           margin: 0, letterSpacing: 0.3,
