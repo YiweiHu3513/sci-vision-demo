@@ -13,6 +13,11 @@ import Library from './pages/Library';
 import AuthModal from './components/AuthModal';
 import './index.css';
 
+const STEP_BAR_FROM_INTERNAL_STEP = { 0: 0, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6 };
+const STEP_BAR_TO_INTERNAL_STEP = { 0: 0, 1: 2, 2: 3, 3: 4, 5: 6, 6: 7 };
+const POST_DELIVERY_ALLOWED_STEP_BAR = new Set([5, 6]);
+const REGEN_PRICING = Object.freeze({ poster: 12, pptPerPage: 2 });
+
 // Demo projects data
 const DEMO_PROJECTS = [
   {
@@ -92,6 +97,9 @@ export default function App() {
   const [projects, setProjects] = useState(DEMO_PROJECTS);
   const [currentProjectName, setCurrentProjectName] = useState('');
   const [selectedOutputs, setSelectedOutputs] = useState({ video: true, poster: true, ppt: true });
+  const [userCredits, setUserCredits] = useState(150);
+  const [stepBarMaxReached, setStepBarMaxReached] = useState(0);
+  const [hasDeliveryCompleted, setHasDeliveryCompleted] = useState(false);
   const busyRef = useRef(false);
 
   useEffect(() => {
@@ -104,11 +112,18 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  const internalStepToStepBarIndex = (internalStep) => STEP_BAR_FROM_INTERNAL_STEP[internalStep] ?? 0;
+  const activeStepBarIndex = internalStepToStepBarIndex(step);
+
   const goTo = (newStep, newView = 'workflow') => {
     if (busyRef.current) return;
     busyRef.current = true;
     setAnimIn(false);
     setTimeout(() => {
+      if (newView === 'workflow') {
+        setStepBarMaxReached((prev) => Math.max(prev, internalStepToStepBarIndex(newStep)));
+        if (newStep === 7) setHasDeliveryCompleted(true);
+      }
       setStep(newStep);
       setView(newView);
       setAnimIn(true);
@@ -158,6 +173,8 @@ export default function App() {
     setTimeout(() => {
       setStep(0);
       setView('workflow');
+      setStepBarMaxReached(0);
+      setHasDeliveryCompleted(false);
       setAnimIn(true);
       setTimeout(() => { busyRef.current = false; }, 700);
     }, 300);
@@ -205,14 +222,42 @@ export default function App() {
     goToFromUserAction(4);
   };
 
-  // StepBar click → map stepbar index to internal step number
-  // StepBar indices: 0=上传, 1=分析, 2=选择物料, 3=配置, 4=生成中, 5=创意工坊, 6=完成
-  // Internal steps: 0=Upload, 1=ModeSelect, 2=Analysis, 3=MaterialSelect, 4=Config, 5=Pipeline, 6=CreativeStudio, 7=Delivery
-  const stepBarIndexToInternalStep = { 0: 0, 1: 2, 2: 3, 3: 4, 5: 6, 6: 7 };
+  const canGoToStepBarIndex = (targetIndex, currentIndex = activeStepBarIndex) => {
+    if (view !== 'workflow') return false;
+    if (targetIndex === 4) return false; // "生成中" should never be manually entered
+    if (hasDeliveryCompleted) return POST_DELIVERY_ALLOWED_STEP_BAR.has(targetIndex) && targetIndex !== currentIndex; // only creative<->delivery loop
+    return targetIndex < currentIndex && targetIndex <= stepBarMaxReached;
+  };
+
+  const spendCredits = (cost, reasonText = '当前操作') => {
+    const normalized = Math.max(0, Number(cost) || 0);
+    if (normalized === 0) return true;
+    if (userCredits < normalized) {
+      window.alert(`积分不足：当前 ${userCredits} 积分，${reasonText} 需要 ${normalized} 积分。`);
+      return false;
+    }
+    setUserCredits((prev) => prev - normalized);
+    return true;
+  };
+
+  const handleRequestRegenerate = ({ assetType, pageCount = 1, source = 'delivery' }) => {
+    const safePageCount = Math.max(1, Math.floor(Number(pageCount) || 1));
+    const isPoster = assetType === 'poster';
+    const cost = isPoster ? REGEN_PRICING.poster : safePageCount * REGEN_PRICING.pptPerPage;
+    const targetText = isPoster ? '海报' : `PPT ${safePageCount} 页`;
+    const sourceText = source === 'creative' ? '创意工坊' : '交付页';
+    const confirmed = window.confirm(
+      `即将重新生成${targetText}，将消耗 ${cost} 积分。\n继续后会覆盖当前${sourceText}中的对应结果，是否继续？`,
+    );
+    if (!confirmed) return false;
+    return spendCredits(cost, `重新生成${targetText}`);
+  };
+
   const handleStepBarClick = (stepBarIndex) => {
-    const internalStep = stepBarIndexToInternalStep[stepBarIndex];
+    if (!canGoToStepBarIndex(stepBarIndex)) return;
+    const internalStep = STEP_BAR_TO_INTERNAL_STEP[stepBarIndex];
     if (internalStep !== undefined) {
-      goTo(internalStep);
+      goToFromUserAction(internalStep);
     }
   };
 
@@ -227,6 +272,8 @@ export default function App() {
     onNavLibrary: () => switchView('library'),
     onGoHome: handleNewProject,
     onGoToStep: handleStepBarClick,
+    stepBarMaxReached,
+    canGoToStepBar: canGoToStepBarIndex,
     projectName: (view === 'workflow' && step > 0) || view === 'agent' ? currentProjectName : undefined,
     onProjectNameChange: (name) => setCurrentProjectName(name),
   };
@@ -267,8 +314,29 @@ export default function App() {
             {step === 3 && <MaterialSelect onNext={() => goTo(selectedOutputs.video ? 4 : 6)} onBack={() => goToFromUserAction(2)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
             {step === 4 && <Config   onNext={handleConfigNext} onBack={() => goToFromUserAction(3)} selectedOutputs={selectedOutputs} onOutputsChange={setSelectedOutputs} {...navProps} />}
             {step === 5 && <Pipeline {...navProps} onNext={() => goTo(6)} onCancel={handlePipelineCancel} />}
-            {step === 6 && <CreativeStudio onNext={() => goTo(7)} onBack={() => goToFromUserAction(selectedOutputs.video ? 5 : 4)} selectedOutputs={selectedOutputs} {...navProps} />}
-            {step === 7 && <Delivery onReset={handleNewProject} onBack={() => goToFromUserAction(6)} selectedOutputs={selectedOutputs} {...navProps} />}
+            {step === 6 && (
+              <CreativeStudio
+                onNext={() => goTo(7)}
+                onBack={() => goToFromUserAction(selectedOutputs.video ? 5 : 4)}
+                selectedOutputs={selectedOutputs}
+                userCredits={userCredits}
+                regenPricing={REGEN_PRICING}
+                onRequestRegenerate={(payload) => handleRequestRegenerate({ ...payload, source: 'creative' })}
+                {...navProps}
+              />
+            )}
+            {step === 7 && (
+              <Delivery
+                onReset={handleNewProject}
+                onBack={() => goToFromUserAction(6)}
+                selectedOutputs={selectedOutputs}
+                userCredits={userCredits}
+                regenPricing={REGEN_PRICING}
+                onSpendCredits={spendCredits}
+                onRequestRegenerate={(payload) => handleRequestRegenerate({ ...payload, source: 'delivery' })}
+                {...navProps}
+              />
+            )}
           </>
         )}
       </div>

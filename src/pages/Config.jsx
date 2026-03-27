@@ -159,7 +159,7 @@ function calcEstimate(configs) {
   return { timeStr: timeStr.trim(), pts: totalPts };
 }
 
-export default function Config({ onNext, onBack, onGoToStep, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange, selectedOutputs }) {
+export default function Config({ onNext, onBack, onGoToStep, stepBarMaxReached, canGoToStepBar, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange, selectedOutputs }) {
   const [configs, setConfigs] = useState(INITIAL);
   const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
   const hasVideo = outputs.video;
@@ -173,7 +173,7 @@ export default function Config({ onNext, onBack, onGoToStep, user, onOpenAuth, o
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={3} onGoToStep={onGoToStep} />
+      <StepBar active={3} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       {onBack && (
         <div style={{ padding: '8px 20px 0' }}>

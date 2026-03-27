@@ -154,7 +154,7 @@ export default function MaterialSelect({
   onNext, onBack,
   selectedOutputs, onOutputsChange,
   user, onOpenAuth, onLogout, onNavLibrary,
-  projectName, onProjectNameChange, onGoToStep,
+  projectName, onProjectNameChange, onGoToStep, stepBarMaxReached, canGoToStepBar,
 }) {
   const sel = selectedOutputs || { video: true, poster: true, ppt: true };
   const selectedCount = Object.values(sel).filter(Boolean).length;
@@ -179,7 +179,7 @@ export default function MaterialSelect({
         onNavLibrary={onNavLibrary}
         projectName={projectName} onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={2} onGoToStep={onGoToStep} />
+      <StepBar active={2} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       {onBack && (
         <div style={{ padding: '8px 24px 0' }}>

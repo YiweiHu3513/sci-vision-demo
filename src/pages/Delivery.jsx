@@ -477,8 +477,9 @@ function SlideCarousel({ compact = false }) {
   );
 }
 
-function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl, pptFilename, fillHeight = false }) {
+function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl, pptFilename, regenUnitCredits = 2, fillHeight = false }) {
   const marked = markedSlides.size;
+  const regenCost = marked * regenUnitCredits;
   return (
     <div style={{
       borderRadius: 16, border: '1px solid var(--border)',
@@ -513,7 +514,7 @@ function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl
               color: '#fff', background: '#C45C5C', border: 'none',
               borderRadius: 8, padding: '5px 14px',
             }}>
-              ↻ 重新生成 {marked} 页
+              ↻ 重新生成 {marked} 页（{regenCost} 积分）
             </button>
           )}
           <a href={pptUrl} download={pptFilename} style={{
@@ -527,7 +528,7 @@ function PptGridView({ slides, markedSlides, onToggleMark, onRegenMarked, pptUrl
         padding: '8px 16px', fontSize: 11, color: 'var(--text-l)',
         background: 'var(--bg)', borderBottom: '1px solid var(--border)',
       }}>
-        💡 点击卡片标记需要重新生成的页面，选完后点击「重新生成」
+        💡 点击卡片标记需要重新生成的页面，确认后会扣除对应积分并覆盖当前页
       </div>
       {/* Grid */}
       <div style={{
@@ -623,6 +624,8 @@ const ctrlBtnStyle = {
 export default function Delivery({
   onReset,
   onGoToStep,
+  stepBarMaxReached,
+  canGoToStepBar,
   user,
   onOpenAuth,
   onLogout,
@@ -630,6 +633,10 @@ export default function Delivery({
   projectName,
   onProjectNameChange,
   selectedOutputs,
+  userCredits = 0,
+  regenPricing,
+  onSpendCredits,
+  onRequestRegenerate,
 }) {
   const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
   // Filter media tabs based on what user selected
@@ -644,7 +651,6 @@ export default function Delivery({
   const [currentRes, setCurrentRes] = useState(resolutions[0]);
   const [pendingRes, setPendingRes] = useState(null);
   const [upgrading, setUpgrading] = useState(false);
-  const [userCredits] = useState(150);
   const [speed, setSpeed] = useState('1x');
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showPosterPreview, setShowPosterPreview] = useState(false);
@@ -652,6 +658,9 @@ export default function Delivery({
   const [posterReady, setPosterReady] = useState(() => new Set(['a3_landscape']));
   const [markedSlides, setMarkedSlides] = useState(new Set());
   const [regenToast, setRegenToast] = useState(false);
+  const [regenToastText, setRegenToastText] = useState('');
+  const pptRegenPerPage = regenPricing?.pptPerPage ?? 2;
+  const posterRegenCost = regenPricing?.poster ?? 12;
 
   const videoRef = useRef(null);
   const speedRef = useRef(null);
@@ -754,6 +763,9 @@ export default function Delivery({
   };
 
   const handleUpgradeConfirm = () => {
+    if (!pendingRes) return;
+    const paid = onSpendCredits ? onSpendCredits(pendingRes.credits, `升级至 ${pendingRes.label}`) : true;
+    if (!paid) return;
     setPendingRes(null);
     setUpgrading(true);
     setTimeout(() => {
@@ -773,6 +785,12 @@ export default function Delivery({
       next.add(key);
       return next;
     });
+  };
+
+  const flashRegenToast = (text) => {
+    setRegenToastText(text);
+    setRegenToast(true);
+    setTimeout(() => setRegenToast(false), 2000);
   };
 
   const dynamicExport = [
@@ -838,7 +856,7 @@ export default function Delivery({
         projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={6} onGoToStep={onGoToStep} />
+      <StepBar active={6} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
         <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sage)' }}>✦  视频生成完成</span>
@@ -1093,11 +1111,18 @@ export default function Delivery({
                   return next;
                 })}
                 onRegenMarked={() => {
-                  setRegenToast(true);
-                  setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000);
+                  const markedCount = markedSlides.size;
+                  if (markedCount <= 0) return;
+                  const allowed = onRequestRegenerate
+                    ? onRequestRegenerate({ assetType: 'ppt', pageCount: markedCount })
+                    : true;
+                  if (!allowed) return;
+                  flashRegenToast(`正在重新生成 ${markedCount} 页 PPT，请稍候…`);
+                  setMarkedSlides(new Set());
                 }}
                 pptUrl={DEMO_ASSETS.ppt.url}
                 pptFilename={DEMO_ASSETS.ppt.filename}
+                regenUnitCredits={pptRegenPerPage}
                 fillHeight
               />
             </div>
@@ -1246,11 +1271,19 @@ export default function Delivery({
                     </div>
                   )}
                 </div>
-                <button style={{
+                <button
+                  onClick={() => {
+                    const allowed = onRequestRegenerate
+                      ? onRequestRegenerate({ assetType: 'poster', pageCount: 1 })
+                      : true;
+                    if (!allowed) return;
+                    flashRegenToast('正在重新生成海报，请稍候…');
+                  }}
+                  style={{
                   marginTop: 8, padding: '11px', borderRadius: 10,
                   background: 'var(--sage)', border: 'none', color: '#fff',
                   fontSize: 12, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
-                }}>↻ 重新生成海报</button>
+                }}>↻ 重新生成海报（{posterRegenCost} 积分）</button>
               </div>
               </div>
             </div>
@@ -1272,6 +1305,9 @@ export default function Delivery({
           }}
         >
           <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12 }}>导出与分享</div>
+          <div style={{ fontSize: 11, color: 'var(--text-l)', marginBottom: 10 }}>
+            当前积分：<b style={{ color: 'var(--text-d)' }}>{userCredits}</b>
+          </div>
 
           {filteredExport.map((item, i) => (
             <div
@@ -1371,7 +1407,7 @@ export default function Delivery({
           padding: '12px 24px', borderRadius: 12, background: '#C45C5C', color: '#fff',
           fontSize: 13, fontWeight: 600, boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
         }}>
-          正在重新生成选中页面，请稍候…
+          {regenToastText || '正在重新生成，请稍候…'}
         </div>
       )}
     </div>

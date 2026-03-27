@@ -310,17 +310,17 @@ function ProposalSelect({ journal, onSelect, onBack }) {
 }
 
 /* ── Step 4: 预览与下载 ── */
-function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneration, onDone, isDone, onSwitchToPPT }) {
+function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneration, onDone, isDone, onSwitchToPPT, userCredits = 0, regenPricing, onRequestRegenerate }) {
   const [generating, setGenerating] = useState(true);
   const [activeLayout, setActiveLayout] = useState('portrait');
   const [showModifyPanel, setShowModifyPanel] = useState(false);
   const [modifyText, setModifyText] = useState('');
   const [adoptedSuggestions, setAdoptedSuggestions] = useState(new Set());
-  const [freeRetries, setFreeRetries] = useState(2);
   const [regenerating, setRegenating] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [qualityWarning] = useState(false);
+  const posterRegenCost = regenPricing?.poster ?? 12;
 
   const posterUrls = {
     portrait: '/demo-samples/llm-agents-poster-a3-portrait.png',
@@ -331,9 +331,11 @@ function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneratio
   useEffect(() => { const t = setTimeout(() => setGenerating(false), 4000); return () => clearTimeout(t); }, []);
 
   const handleRegenerate = () => {
-    if (freeRetries <= 0) { setShowPaywall(true); return; }
+    const allowed = onRequestRegenerate
+      ? onRequestRegenerate({ assetType: 'poster', pageCount: 1 })
+      : true;
+    if (!allowed) return;
     setRegenating(true);
-    setFreeRetries(v => v - 1);
     setTimeout(() => setRegenating(false), 3000);
   };
 
@@ -464,10 +466,10 @@ function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneratio
                 style={{ width: '100%', minHeight: 56, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg)', fontSize: 11, fontFamily: 'inherit', resize: 'vertical', lineHeight: 1.5 }} />
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '10px 0 8px' }}>
                 <button onClick={onBackToProposals} style={{ border: '1px solid var(--border)', background: 'var(--bg)', borderRadius: 8, padding: '6px 14px', fontSize: 10, fontWeight: 600, color: 'var(--text-m)', cursor: 'pointer', fontFamily: 'inherit' }}>🔄 换一个创意方案</button>
-                <span style={{ fontSize: 10, color: 'var(--text-l)' }}>剩余免费修改：{freeRetries}/2</span>
+                <span style={{ fontSize: 10, color: 'var(--text-l)' }}>重生成消耗：{posterRegenCost} 积分 · 当前：{userCredits} 积分</span>
               </div>
               <button onClick={handleRegenerate}
-                style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--lav)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 重新生成</button>
+                style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--lav)', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>🔄 重新生成（{posterRegenCost} 积分）</button>
             </div>
           )}
 
@@ -525,7 +527,7 @@ function PosterPreview({ proposal, journal, onBackToProposals, onCancelGeneratio
 }
 
 /* ═══ 主容器 ═══ */
-export default function PosterFlowInner({ onDone, isDone, onSwitchToPPT }) {
+export default function PosterFlowInner({ onDone, isDone, onSwitchToPPT, userCredits, regenPricing, onRequestRegenerate }) {
   const [subStep, setSubStep] = useState(0);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedJournal, setSelectedJournal] = useState(null);
@@ -537,7 +539,7 @@ export default function PosterFlowInner({ onDone, isDone, onSwitchToPPT }) {
       {subStep === 0 && <StyleSelect onSelect={(id) => { setSelectedStyle(id); if (id === 'journal') setSubStep(1); }} />}
       {subStep === 1 && <JournalSelect onSelect={(id) => { setSelectedJournal(id); setSubStep(2); }} onBack={() => setSubStep(0)} />}
       {subStep === 2 && <ProposalSelect journal={selectedJournal} onSelect={(p) => { setSelectedProposal(p); setSubStep(3); }} onBack={() => setSubStep(1)} />}
-      {subStep === 3 && <PosterPreview proposal={selectedProposal} journal={selectedJournal} onBackToProposals={() => setSubStep(2)} onCancelGeneration={() => setSubStep(2)} onDone={onDone} isDone={isDone} onSwitchToPPT={onSwitchToPPT} />}
+      {subStep === 3 && <PosterPreview proposal={selectedProposal} journal={selectedJournal} onBackToProposals={() => setSubStep(2)} onCancelGeneration={() => setSubStep(2)} onDone={onDone} isDone={isDone} onSwitchToPPT={onSwitchToPPT} userCredits={userCredits} regenPricing={regenPricing} onRequestRegenerate={onRequestRegenerate} />}
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }

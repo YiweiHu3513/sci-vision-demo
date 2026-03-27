@@ -349,10 +349,11 @@ function PPTGenerating({ config, onDone, onCancel }) {
 }
 
 /* ── Step 4: PPT 预览与下载 ── */
-function PPTPreview({ config, onDone, isDone, onSwitchToPoster }) {
+function PPTPreview({ config, onDone, isDone, onSwitchToPoster, userCredits = 0, regenPricing, onRequestRegenerate }) {
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [markedSlides, setMarkedSlides] = useState(new Set());
   const [regenToast, setRegenToast] = useState(false);
+  const pptRegenPerPage = regenPricing?.pptPerPage ?? 2;
 
   const slides = Array.from({ length: Math.min(config.pages, 12) }, (_, i) => ({
     page: i + 1,
@@ -361,8 +362,17 @@ function PPTPreview({ config, onDone, isDone, onSwitchToPoster }) {
   }));
 
   const toggleMark = (i) => { setMarkedSlides(prev => { const next = new Set(prev); if (next.has(i)) next.delete(i); else next.add(i); return next; }); };
-  const handleRegen = () => { setRegenToast(true); setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000); };
   const marked = markedSlides.size;
+  const regenCost = marked * pptRegenPerPage;
+  const handleRegen = () => {
+    if (marked <= 0) return;
+    const allowed = onRequestRegenerate
+      ? onRequestRegenerate({ assetType: 'ppt', pageCount: marked })
+      : true;
+    if (!allowed) return;
+    setRegenToast(true);
+    setTimeout(() => { setRegenToast(false); setMarkedSlides(new Set()); }, 2000);
+  };
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '12px 24px' }}>
@@ -370,9 +380,10 @@ function PPTPreview({ config, onDone, isDone, onSwitchToPoster }) {
         <div>
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 2 }}>PPT 预览</h2>
           <p style={{ fontSize: 12, color: 'var(--text-l)' }}>{slides.length} 页 · 点击缩略图选中查看大图</p>
+          <p style={{ fontSize: 11, color: 'var(--text-l)', marginTop: 4 }}>当前积分：{userCredits} · 重生成每页 {pptRegenPerPage} 积分</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          {marked > 0 && <button onClick={handleRegen} style={{ fontSize: 11, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', color: '#fff', background: '#C45C5C', border: 'none', borderRadius: 8, padding: '7px 16px' }}>↻ 重新生成 {marked} 页</button>}
+          {marked > 0 && <button onClick={handleRegen} style={{ fontSize: 11, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', color: '#fff', background: '#C45C5C', border: 'none', borderRadius: 8, padding: '7px 16px' }}>↻ 重新生成 {marked} 页（{regenCost} 积分）</button>}
           <a href="/demo-samples/llm-agents-deck.pptx" download style={{ fontSize: 11, color: 'var(--dust)', textDecoration: 'none', border: '1px solid var(--dust)', borderRadius: 8, padding: '7px 16px', fontWeight: 700, display: 'inline-flex', alignItems: 'center' }}>⬇️ 下载 PPTX</a>
         </div>
       </div>
@@ -454,7 +465,7 @@ function PPTPreview({ config, onDone, isDone, onSwitchToPoster }) {
 
       {regenToast && (
         <div style={{ position: 'fixed', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 140, padding: '12px 24px', borderRadius: 12, background: '#C45C5C', color: '#fff', fontSize: 13, fontWeight: 600, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
-          正在重新生成选中页面，请稍候…
+          正在重新生成选中 PPT 页面，请稍候…
         </div>
       )}
     </div>
@@ -462,7 +473,7 @@ function PPTPreview({ config, onDone, isDone, onSwitchToPoster }) {
 }
 
 /* ═══ 主容器 ═══ */
-export default function PPTFlowInner({ onDone, isDone, onSwitchToPoster }) {
+export default function PPTFlowInner({ onDone, isDone, onSwitchToPoster, userCredits, regenPricing, onRequestRegenerate }) {
   const [subStep, setSubStep] = useState(0);
   const [selectedScene, setSelectedScene] = useState(null);
   const [config, setConfig] = useState(null);
@@ -473,7 +484,7 @@ export default function PPTFlowInner({ onDone, isDone, onSwitchToPoster }) {
       {subStep === 0 && <SceneSelect onSelect={(id) => { setSelectedScene(id); setSubStep(1); }} />}
       {subStep === 1 && <PPTConfig scene={selectedScene} onSubmit={(cfg) => { setConfig(cfg); setSubStep(2); }} onBack={() => setSubStep(0)} />}
       {subStep === 2 && <PPTGenerating config={config} onDone={() => setSubStep(3)} onCancel={() => setSubStep(1)} />}
-      {subStep === 3 && <PPTPreview config={config} onDone={onDone} isDone={isDone} onSwitchToPoster={onSwitchToPoster} />}
+      {subStep === 3 && <PPTPreview config={config} onDone={onDone} isDone={isDone} onSwitchToPoster={onSwitchToPoster} userCredits={userCredits} regenPricing={regenPricing} onRequestRegenerate={onRequestRegenerate} />}
       <style>{`@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }`}</style>
     </>
   );

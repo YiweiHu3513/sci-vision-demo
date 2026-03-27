@@ -37,6 +37,8 @@ export default function ModeSelect({
   onSelectManual,
   onBack,
   onGoToStep,
+  stepBarMaxReached,
+  canGoToStepBar,
   user, onOpenAuth, onLogout, onNavLibrary,
   projectName, onProjectNameChange,
 }) {
@@ -49,7 +51,7 @@ export default function ModeSelect({
         onNavLibrary={onNavLibrary} projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={0} onGoToStep={onGoToStep} />
+      <StepBar active={0} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '24px 24px 40px' }}>
         {onBack && (

@@ -1,13 +1,14 @@
-export default function StepBar({ active = 0, onGoToStep }) {
+export default function StepBar({ active = 0, onGoToStep, maxReached = active, canGoToStep }) {
   const steps = ['上传论文','分析确认','选择物料','配置参数','生成中','创意工坊','完成'];
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '18px 0 0', gap: 0 }}>
       {steps.map((step, i) => {
-        const done = i < active;
         const act  = i === active;
+        const reached = i <= maxReached;
+        const done = reached && !act;
         const accent = i === 5 ? 'var(--lav)' : 'var(--sage)';
-        // Clickable if done AND we have a handler AND it's not the "生成中" step (index 4)
-        const clickable = done && onGoToStep && i !== 4;
+        const allowedByRule = typeof canGoToStep === 'function' ? canGoToStep(i, active) : (done && i !== 4);
+        const clickable = allowedByRule && onGoToStep;
         return (
           <div key={i} style={{ display: 'flex', alignItems: 'center' }}>
             <div
@@ -45,7 +46,7 @@ export default function StepBar({ active = 0, onGoToStep }) {
             {i < steps.length - 1 && (
               <div style={{
                 width: 40, height: 1.5, marginTop: -14,
-                background: done ? 'var(--sage)' : 'var(--border)'
+                background: i < maxReached ? 'var(--sage)' : 'var(--border)'
               }} />
             )}
           </div>

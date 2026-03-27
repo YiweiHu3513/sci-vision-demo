@@ -22,9 +22,14 @@ const TABS = [
 export default function CreativeStudio({
   onNext,
   onGoToStep,
+  stepBarMaxReached,
+  canGoToStepBar,
   user, onOpenAuth, onLogout, onNavLibrary,
   projectName, onProjectNameChange,
   selectedOutputs,
+  userCredits,
+  regenPricing,
+  onRequestRegenerate,
 }) {
   const outputs = selectedOutputs || { video: true, poster: true, ppt: true };
   const showPoster = outputs.poster;
@@ -61,12 +66,13 @@ export default function CreativeStudio({
         onNavLibrary={onNavLibrary} projectName={projectName}
         onProjectNameChange={onProjectNameChange}
       />
-      <StepBar active={5} onGoToStep={onGoToStep} />
+      <StepBar active={5} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       {/* Tab switcher + skip link */}
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px 0 0', gap: 6,
       }}>
+        <div style={{ fontSize: 11, color: 'var(--text-l)' }}>当前积分：{userCredits}（重生成时扣减）</div>
         <div style={{
           display: 'inline-flex', gap: 4, padding: '4px 5px',
           borderRadius: 12, border: '1px solid var(--border)', background: 'var(--card)',
@@ -127,6 +133,9 @@ export default function CreativeStudio({
             onDone={() => setPosterDone(true)}
             isDone={posterDone}
             onSwitchToPPT={showPPT ? () => setActiveTab('ppt') : null}
+            userCredits={userCredits}
+            regenPricing={regenPricing}
+            onRequestRegenerate={onRequestRegenerate}
           />
         </div>
       )}
@@ -136,6 +145,9 @@ export default function CreativeStudio({
             onDone={() => setPptDone(true)}
             isDone={pptDone}
             onSwitchToPoster={showPoster ? () => setActiveTab('poster') : null}
+            userCredits={userCredits}
+            regenPricing={regenPricing}
+            onRequestRegenerate={onRequestRegenerate}
           />
         </div>
       )}

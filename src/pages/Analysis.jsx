@@ -126,7 +126,7 @@ function EditableField({ label, value, onChange, multiline }) {
   );
 }
 
-export default function Analysis({ onNext, onBack, onGoToStep, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
+export default function Analysis({ onNext, onBack, onGoToStep, stepBarMaxReached, canGoToStepBar, user, onOpenAuth, onLogout, onNavLibrary, projectName, onProjectNameChange }) {
   const [data, setData] = useState(initialData);
   const [msgs, setMsgs] = useState(initialMessages);
   const [input, setInput] = useState('');
@@ -155,7 +155,7 @@ export default function Analysis({ onNext, onBack, onGoToStep, user, onOpenAuth,
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar user={user} onOpenAuth={onOpenAuth} onLogout={onLogout} onNavLibrary={onNavLibrary} projectName={projectName} onProjectNameChange={onProjectNameChange} />
-      <StepBar active={1} onGoToStep={onGoToStep} />
+      <StepBar active={1} onGoToStep={onGoToStep} maxReached={stepBarMaxReached} canGoToStep={canGoToStepBar} />
 
       {onBack && (
         <div style={{ padding: '8px 24px 0' }}>
