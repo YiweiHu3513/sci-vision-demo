@@ -39,6 +39,17 @@ const CONFIG_GROUPS = [
   },
 ];
 
+const GROUP_IMPACT_COPY = {
+  narrative: {
+    title: '参数影响说明',
+    text: '当「目标受众 + 叙事角度」组合变化时，会重设脚本结构与旁白语言逻辑；后端由独立的“叙事目标文档”完成预设映射。',
+  },
+  visual: {
+    title: '参数影响说明',
+    text: '该分组主要决定画面与听感：切换视觉风格会命中不同“视听风格文档”并生成不同画面风格；语音音色与背景音乐会同步影响听觉呈现。',
+  },
+};
+
 // 对话中提取到的初始值
 const INITIAL = {
   '视频时长': { val:'2 分钟（约 10 段分镜）', fromChat:true },
@@ -308,6 +319,22 @@ export default function Config({ onNext, onBack, onGoToStep, stepBarMaxReached, 
                           );
                         })}
                       </div>
+
+                      {GROUP_IMPACT_COPY[group.id] && (
+                        <div style={{
+                          marginTop:10,
+                          padding:'8px 10px',
+                          borderRadius:9,
+                          border:'1px solid var(--border)',
+                          background:'#F8F8F6',
+                          fontSize:10,
+                          lineHeight:1.6,
+                          color:'var(--text-m)',
+                        }}>
+                          <span style={{ color:'var(--text-d)', fontWeight:700 }}>ℹ {GROUP_IMPACT_COPY[group.id].title}：</span>
+                          {GROUP_IMPACT_COPY[group.id].text}
+                        </div>
+                      )}
 
                       {group.id === 'narrative' && (
                         <div style={{
