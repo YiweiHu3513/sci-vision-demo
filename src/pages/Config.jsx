@@ -1,17 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import StepBar from '../components/StepBar';
 
 // 每个字段的选项
 const OPTIONS = {
   '视频时长': ['1 分钟（约 5 段分镜）', '2 分钟（约 10 段分镜）', '3 分钟（约 15 段分镜）', '5 分钟（约 25 段分镜）'],
-  '目标受众': ['普通科学爱好者（非专业）', '本领域研究者', '高校本科生', '科技媒体读者', '政府/投资人'],
+  '目标受众': ['科学爱好者', '领域研究者', '政府 / 投资人'],
   '视觉风格': ['Houdini 物理渲染 + Morandi 配色', '2D 扁平插图风格', '数据可视化主导', '实拍素材 + 动效', '手绘概念图'],
   '解说语言': ['中文普通话', '英语', '中英双语字幕', '粤语'],
-  '叙事角度': ['科普解说（从问题出发）', '学术报告（方法驱动）', '故事叙事（人物驱动）', '对比分析（结果驱动）'],
+  '叙事角度': ['从问题出发', '从发现出发', '从方法出发', '从影响出发', '人物故事', '历史演进', '反直觉'],
   '语音音色': ['标准女声 · 沉稳自然', '标准男声 · 沉稳专业', '青年女声 · 活泼亲切', '青年男声 · 充满激情'],
   '背景音乐': ['轻氛围 · 钢琴弦乐 · 低混响', '科技感 · 电子合成器', '无背景音乐', '自然音效 · 纯净'],
-  '输出格式': ['MP4 1080p · PPTX · 分镜脚本 PDF', 'MP4 1080p 仅视频', 'MP4 4K 超清', '竖版 MP4 9:16（短视频）'],
+  '分镜画面语言': ['英文（学术类推荐）', '中文（科普类推荐）'],
+  '字幕语言': ['中文字幕', '英文字幕', '中英双语字幕', '无字幕'],
+  '清晰度': ['720P 标清', '4K 超清（默认）', '8K 极清'],
 };
 
 // 右侧配置改为三组卡片，避免“大表单”阅读负担
@@ -34,8 +36,8 @@ const CONFIG_GROUPS = [
     id: 'delivery',
     icon: '◍',
     title: '交付设置',
-    hint: '语言 / 输出格式',
-    fields: ['解说语言', '输出格式'],
+    hint: '语言 / 字幕 / 清晰度',
+    fields: ['解说语言', '分镜画面语言', '字幕语言', '清晰度'],
   },
 ];
 
@@ -53,28 +55,43 @@ const GROUP_IMPACT_COPY = {
 // 对话中提取到的初始值
 const INITIAL = {
   '视频时长': { val:'2 分钟（约 10 段分镜）', fromChat:true },
-  '目标受众': { val:'普通科学爱好者（非专业）', fromChat:true },
+  '目标受众': { val:'科学爱好者', fromChat:true },
   '视觉风格': { val:'Houdini 物理渲染 + Morandi 配色', fromChat:true },
   '解说语言': { val:'中文普通话', fromChat:true },
-  '叙事角度': { val:'科普解说（从问题出发）', fromChat:false },
+  '叙事角度': { val:'从问题出发', fromChat:false },
   '语音音色': { val:'标准女声 · 沉稳自然', fromChat:false },
   '背景音乐': { val:'轻氛围 · 钢琴弦乐 · 低混响', fromChat:false },
-  '输出格式': { val:'MP4 1080p · PPTX · 分镜脚本 PDF', fromChat:false },
+  '分镜画面语言': { val:'英文（学术类推荐）', fromChat:false },
+  '字幕语言': { val:'中文字幕', fromChat:false },
+  '清晰度': { val:'4K 超清（默认）', fromChat:false },
 };
 
 // 从对话中提取的意图摘要
 const CHAT_INTENTS = [
   { key:'视频时长',  val:'「2分钟左右，分10段」' },
-  { key:'目标受众',  val:'「面向非专业科学爱好者」' },
+  { key:'目标受众',  val:'「面向科学爱好者」' },
   { key:'视觉风格',  val:'「Houdini 渲染质感，莫兰迪色系」' },
   { key:'解说语言',  val:'「中文普通话」' },
 ];
 
 function SelectField({ label, value, fromChat, options, onChange }) {
   const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+
+  // 点击外部自动收起下拉菜单
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
 
   return (
-    <div style={{ position:'relative' }}>
+    <div ref={wrapRef} style={{ position:'relative' }}>
       <div style={{ fontSize:10, color:'var(--text-m)', marginBottom:5, fontWeight:700, letterSpacing:0.2 }}>{label}</div>
       <div
         onClick={() => setOpen(o => !o)}
@@ -153,15 +170,14 @@ function calcEstimate(configs) {
     '实拍素材 + 动效':                 { sec: 20, pts: 3 },
     '手绘概念图':                       { sec: 25, pts: 3 },
   };
-  const formatExtra = {
-    'MP4 1080p · PPTX · 分镜脚本 PDF': { sec: 15, pts: 2 },
-    'MP4 1080p 仅视频':                  { sec: 0,  pts: 0 },
-    'MP4 4K 超清':                        { sec: 40, pts: 5 },
-    '竖版 MP4 9:16（短视频）':            { sec: 10, pts: 1 },
+  const resolutionExtra = {
+    '720P 标清':         { sec: 0,  pts: 0 },
+    '4K 超清（默认）':    { sec: 15, pts: 2 },
+    '8K 极清':            { sec: 40, pts: 5 },
   };
   const base = durMap[configs['视频时长']?.val] ?? { sec: 120, pts: 12 };
   const style = styleExtra[configs['视觉风格']?.val] ?? { sec: 0, pts: 0 };
-  const fmt = formatExtra[configs['输出格式']?.val] ?? { sec: 0, pts: 0 };
+  const fmt = resolutionExtra[configs['清晰度']?.val] ?? { sec: 0, pts: 0 };
   const totalSec = base.sec + style.sec + fmt.sec;
   const totalPts = base.pts + style.pts + fmt.pts;
   const min = Math.floor(totalSec / 60);

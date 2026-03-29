@@ -17,10 +17,10 @@ const scores = [
 ];
 
 const initialMessages = [
-  { role: 'ai', text: '我已解析完成，请问以上分析结果是否准确？如有问题请告诉我。' },
+  { role: 'ai', text: '📋 解析报告\n\n✅ 论文标题已清晰抓取\n✅ 作者信息已完整提取（2 位作者 · 清华大学）\n✅ 发表期刊/会议已识别：NeurIPS 2024\n✅ 研究领域已分类：计算机视觉 · 模型压缩\n⚠️ 论文摘要较长（约 120 字），建议确认是否需要精简\n\n请核对左侧信息，如有偏差可直接点击编辑，或在下方告诉我哪里需要修正。' },
 ];
 
-const hints = ['作者信息有误', '领域分类不准确', '核心贡献描述需要修正', '图表描述遗漏'];
+const hints = ['作者信息有误', '领域分类不准确', '论文摘要描述需要修正', '图表描述遗漏'];
 
 function computeReplyDelayMs(text) {
   // Use a deterministic hash to keep response delay varied without impure randomness in component scope.
@@ -183,11 +183,14 @@ export default function Analysis({ onNext, onBack, onGoToStep, stepBarMaxReached
             <EditableField label="作者信息" value={data.authors}     onChange={v=>setData(d=>({...d,authors:v}))} />
             <EditableField label="发表期刊 / 会议"  value={data.venue}        onChange={v=>setData(d=>({...d,venue:v}))}  />
             <EditableField label="研究领域"  value={data.field}        onChange={v=>setData(d=>({...d,field:v}))}  />
-            <EditableField label="核心贡献" value={data.contribution} onChange={v=>setData(d=>({...d,contribution:v}))} multiline />
+            <EditableField label="论文摘要" value={data.contribution} onChange={v=>setData(d=>({...d,contribution:v}))} multiline />
 
             <div style={{ height:1, background:'var(--border)', marginBottom:16 }}/>
 
-            <div style={{ fontSize:13, fontWeight:700, marginBottom:12 }}>可视化评估</div>
+            <div style={{ fontSize:13, fontWeight:700, marginBottom:4 }}>可视化友好度评估</div>
+            <div style={{ fontSize:11, color:'var(--text-l)', marginBottom:12, lineHeight:1.5 }}>
+              评估论文内容转化为可视化作品的适配程度。低分 = 意象模糊或叙事抽象，可能需要补充校正；高分 = 结构清晰，可视化潜力好。
+            </div>
             {scores.map(s => (
               <div key={s.label} style={{ marginBottom: 14 }}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
